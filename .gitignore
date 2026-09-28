@@ -1,5 +1,7 @@
+.venv
 .env
 checklist.md
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+**/clean_runs.json
