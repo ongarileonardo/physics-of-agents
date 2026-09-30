@@ -23,3 +23,5 @@ python -m lib.datagen.collect_energy \
 ```
 
 The script will write files into the "demo_output" directory. To be able to see the results, move the files into "data/models/mock/subjective_energy", and then run the "clean_data.ipynb" notebook.
+
+From there, it is possible to run the "0_example.ipynb" notebook to visualize the evolution of the agents'opinion over time and other interesting statistics.
