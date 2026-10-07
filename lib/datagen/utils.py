@@ -7,6 +7,7 @@ import os
 import time
 
 from .samplers import Pi
+from google import genai
 
 TOGETHER_BASE_URL = "https://api.together.xyz/v1"
 
@@ -82,6 +83,121 @@ def make_together_pi(
         api_key=api_key,
         extra_body=extra_body,
     )
+
+def make_aihubmix_pi(
+    model: str = "qwen3.6-plus-preview-free",
+    temperature: float = 0.7,
+    max_output_tokens: int = 256,
+    max_retries: int = 4,
+    api_key: str | None = None,
+    extra_body: dict | None = None,
+) -> Pi:
+    """`Pi` via Aihubmix's OpenAI-compatible endpoint; key from ``AIHUBMIX_API_KEY``."""
+    if api_key is None:
+        api_key = os.environ.get("AIHUBMIX_API_KEY")
+        if api_key is None:
+            raise RuntimeError(
+                "AIHUBMIX_API_KEY is not set. Export it or pass api_key=... "
+                "to make_aihubmix_pi."
+            )
+    return make_openai_pi(
+        model=model,
+        temperature=temperature,
+        max_output_tokens=max_output_tokens,
+        max_retries=max_retries,
+        base_url="https://aihubmix.com/v1",
+        api_key=api_key,
+        extra_body=extra_body,
+    )
+
+# def make_aihubmix_pi(model: str, temperature: float):
+#     client = OpenAI(
+#         api_key=os.environ["AIHUBMIX_API_KEY"],
+#         base_url="https://aihubmix.com/v1",
+#     )
+
+#     def pi(messages):
+#         response = client.chat.completions.create(
+#             model=model,
+#             messages=messages,
+#             temperature=temperature,
+#             max_tokens=1024,
+#         )
+#         return response.choices[0].message.content
+
+#     return pi
+
+import time
+import threading
+
+
+def make_gemini_pi(
+    model: str,
+    temperature: float = 0.7,
+):
+    from google import genai
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise RuntimeError(
+            "GEMINI_API_KEY is not set. Export it before running."
+        )
+    client = genai.Client(api_key=api_key)
+
+    # 12 requests/minute = one request every 5 seconds.
+    min_interval = 5.0
+
+    # Important if you ever use max_workers > 1.
+    rate_lock = threading.Lock()
+    last_request_time = 0.0
+
+    def pi(prompt: str) -> str:
+        nonlocal last_request_time
+
+        # Serialize the rate limiter and enforce spacing.
+        with rate_lock:
+            now = time.monotonic()
+            wait = min_interval - (now - last_request_time)
+
+            if wait > 0:
+                time.sleep(wait)
+
+            last_request_time = time.monotonic()
+
+        response = client.models.generate_content(
+            model=model,
+            contents=prompt,
+            config={
+                "temperature": temperature,
+            },
+        )
+
+        return response.text
+
+    return pi
+
+# def make_gemini_pi(
+#     model: str = "gemini-3.5-flash-lite",
+#     temperature: float = 0.7,
+# ):
+#     api_key = os.getenv("GEMINI_API_KEY")
+#     if not api_key:
+#         raise RuntimeError(
+#             "GEMINI_API_KEY is not set. Export it before running."
+#         )
+
+#     client = genai.Client(api_key=api_key)
+
+#     def pi(prompt: str) -> str:
+#         response = client.models.generate_content(
+#             model=model,
+#             contents=prompt,
+#             config={
+#                 "temperature": temperature,
+#             },
+#         )
+#         return response.text
+
+#     return pi
 
 
 def make_mock_pi(seed: int = 0) -> Pi:

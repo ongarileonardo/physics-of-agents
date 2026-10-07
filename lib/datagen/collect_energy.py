@@ -14,7 +14,7 @@ import numpy as np
 
 from .dynamics import Replica, run_forward_dynamics
 from .graph import make_lattice_J, sample_J_num_edges_symmetric
-from .utils import make_mock_pi, make_openai_pi, make_together_pi
+from .utils import make_gemini_pi, make_mock_pi, make_openai_pi, make_together_pi, make_aihubmix_pi
 
 # Known models -> API backend. Unknown models fall back to name-based inference
 # (org-prefixed "org/name" -> together, bare names -> openai).
@@ -23,6 +23,8 @@ BACKENDS: Dict[str, str] = {
     "meta-llama/Meta-Llama-3-8B-Instruct-Lite": "together",
     "Qwen/Qwen2.5-7B-Instruct-Turbo": "together",
     "google/gemma-3n-E4B-it": "together",
+    "qwen3.6-plus-preview-free": "aihubmix",
+    "gemini-3.5-flash-lite": "gemini",
 }
 
 
@@ -177,7 +179,7 @@ def main() -> None:
     ap.add_argument("--max-workers", type=int, default=256)
     ap.add_argument("--model", default="gpt-4o-mini",
                     help="Model name; known models: " + ", ".join(BACKENDS))
-    ap.add_argument("--backend", choices=("openai", "together"), default=None,
+    ap.add_argument("--backend", choices=("openai", "together", "aihubmix", "gemini"), default=None,
                     help="API backend; inferred from the model name by default.")
     ap.add_argument("--temperature", type=float, default=0.7)
     ap.add_argument("--mode", choices=("subjective", "objective"),
@@ -274,9 +276,25 @@ def main() -> None:
     if args.mock:
         pi = make_mock_pi(seed=args.seed)
     elif backend == "together":
-        pi = make_together_pi(model=args.model, temperature=args.temperature)
+        pi = make_together_pi(
+            model=args.model,
+            temperature=args.temperature,
+        )
+    elif backend == "aihubmix":
+        pi = make_aihubmix_pi(
+            model=args.model,
+            temperature=args.temperature,
+        )
+    elif backend == "gemini":
+        pi = make_gemini_pi(
+            model=args.model,
+            temperature=args.temperature,
+        )
     else:
-        pi = make_openai_pi(model=args.model, temperature=args.temperature)
+        pi = make_openai_pi(
+            model=args.model,
+            temperature=args.temperature,
+        )
 
     print(f"[collect] replicas={len(replicas)} train_q={len(train_qs)} "
           f"test_q={len(test_qs)} train_J={len(train_graphs)} test_J={len(test_graphs)} "
