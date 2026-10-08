@@ -405,6 +405,24 @@ The key conceptual separation is:
 
 ## 3. Running the experiment
 
+| Physics / paper concept          | Where in repository                                      | What it does                                             |
+| -------------------------------- | -------------------------------------------------------- | -------------------------------------------------------- |
+| **Agent / persona**              | `lib/datagen/collect_energy.py` + `dynamics.py`          | Loads personas and associates persona `i` with agent `i` |
+| **Question / statement**         | `collect_energy.py`                                      | Loads the question given to every agent                  |
+| **Interaction matrix \(J\)**     | `lib/datagen/graph.py`                                   | Generates the signed social network                      |
+| **Spin / opinion \(s_i(t)\)**    | `lib/datagen/samplers.py` + `dynamics.py`                | LLM produces an opinion; code converts it to ±1          |
+| **Messages**                     | `lib/datagen/samplers.py` + `dynamics.py`                | LLM generates natural-language messages                  |
+| **Interaction effect of \(J\)**  | `dynamics.py::_build_inboxes()`                          | Places messages into "agree" or "disagree" inboxes       |
+| **Forward dynamics**             | `lib/datagen/dynamics.py`                                | Executes message → inbox → opinion updates               |
+| **Trajectory collection**        | `collect_energy.py` → `run_forward_dynamics()`           | Runs the dynamics and saves trajectories                 |
+| **Replica**                      | `dynamics.py::Replica`                                   | One realization of a question + graph + repeated run     |
+| **Trajectory analysis**          | `res/*.ipynb`, especially `1_archetypes`, `2_conviction` | Studies what happened                                    |
+| **Fitted physics model**         | `res/4_prediction.ipynb` + `res/utils.py`                | Learns the effective dynamical rule                      |
+| **Couplings \(\beta\)**          | `res/couplings.json`                                     | Stores fitted interaction parameters                     |
+| **Temperature \(T\)**            | `res/5_temperaturesweep.ipynb`                           | Studies the fitted model at different noise levels       |
+| **Critical temperature \(T_c\)** | `res/5_temperaturesweep.ipynb`                           | Estimates phase-transition-like behavior                 |
+
+
 Instructions for data generation: use the files under lib/. The following command will use the first question (``--limit 1``) from the training and test sets for the subjective dataset (`data/subj/train.jsonl`, `data/subj/test.jsonl`). It uses the first four personas (``--num-agents 4``) from `data/subj/personas.json`, one shared graph, two update rounds, and three opinion samples per
 agent. `--num-edges 6` specifies six nonzero entries in the symmetric interaction matrix, corresponding to three undirected connections. This demo uses simulated responses through the --mock option, requires no API key, and takes approximately one second on the tested machine. To generate responses using gpt-4o-mini, remove --mock and set the OPENAI_API_KEY environment variable. Runtime for API-backed generation depends on response times and rate limits. Run the following command from the repository root.
 

@@ -10,6 +10,7 @@ from .samplers import Pi
 from google import genai
 
 TOGETHER_BASE_URL = "https://api.together.xyz/v1"
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 
 def make_openai_pi(
@@ -217,3 +218,30 @@ def make_mock_pi(seed: int = 0) -> Pi:
         return "AGREE" if h[0] & 1 else "DISAGREE"
 
     return pi
+
+def make_openrouter_pi(
+    model: str = "openai/gpt-4o-mini",
+    temperature: float = 0.7,
+    max_output_tokens: int = 256,
+    max_retries: int = 4,
+    api_key: str | None = None,
+    extra_body: dict | None = None,
+) -> Pi:
+    """`Pi` via OpenRouter's OpenAI-compatible endpoint."""
+    if api_key is None:
+        api_key = os.environ.get("OPENROUTER_API_KEY")
+        if api_key is None:
+            raise RuntimeError(
+                "OPENROUTER_API_KEY is not set. Export it or pass api_key=... "
+                "to make_openrouter_pi."
+            )
+
+    return make_openai_pi(
+        model=model,
+        temperature=temperature,
+        max_output_tokens=max_output_tokens,
+        max_retries=max_retries,
+        base_url=OPENROUTER_BASE_URL,
+        api_key=api_key,
+        extra_body=extra_body,
+    )

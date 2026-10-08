@@ -14,7 +14,8 @@ import numpy as np
 
 from .dynamics import Replica, run_forward_dynamics
 from .graph import make_lattice_J, sample_J_num_edges_symmetric
-from .utils import make_gemini_pi, make_mock_pi, make_openai_pi, make_together_pi, make_aihubmix_pi
+from .utils import make_gemini_pi, make_mock_pi, make_openai_pi, \
+                    make_together_pi, make_aihubmix_pi, make_openrouter_pi
 
 # Known models -> API backend. Unknown models fall back to name-based inference
 # (org-prefixed "org/name" -> together, bare names -> openai).
@@ -25,6 +26,8 @@ BACKENDS: Dict[str, str] = {
     "google/gemma-3n-E4B-it": "together",
     "qwen3.6-plus-preview-free": "aihubmix",
     "gemini-3.5-flash-lite": "gemini",
+    "gemma-4-26b-a4b-it": "gemini",
+    "nvidia/nemotron-3.5-lightning:free": "openrouter"
 }
 
 
@@ -179,7 +182,8 @@ def main() -> None:
     ap.add_argument("--max-workers", type=int, default=256)
     ap.add_argument("--model", default="gpt-4o-mini",
                     help="Model name; known models: " + ", ".join(BACKENDS))
-    ap.add_argument("--backend", choices=("openai", "together", "aihubmix", "gemini"), default=None,
+    ap.add_argument("--backend", choices=("openai", "together",
+                                            "aihubmix", "gemini", "openrouter"), default=None,
                     help="API backend; inferred from the model name by default.")
     ap.add_argument("--temperature", type=float, default=0.7)
     ap.add_argument("--mode", choices=("subjective", "objective"),
@@ -287,6 +291,11 @@ def main() -> None:
         )
     elif backend == "gemini":
         pi = make_gemini_pi(
+            model=args.model,
+            temperature=args.temperature,
+        )
+    elif backend == "openrouter":
+        pi = make_openrouter_pi(
             model=args.model,
             temperature=args.temperature,
         )
