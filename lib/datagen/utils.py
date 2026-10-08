@@ -220,7 +220,7 @@ def make_mock_pi(seed: int = 0) -> Pi:
     return pi
 
 def make_openrouter_pi(
-    model: str = "openai/gpt-4o-mini",
+    model: str,
     temperature: float = 0.7,
     max_output_tokens: int = 256,
     max_retries: int = 4,
