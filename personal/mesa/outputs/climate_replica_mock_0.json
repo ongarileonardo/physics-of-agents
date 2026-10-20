@@ -1,0 +1,469 @@
+{
+  "meta": {
+    "name": "climate_replica_mock_0",
+    "n": 4,
+    "num_steps": 8,
+    "k": 5,
+    "mode": "subjective"
+  },
+  "personas": [
+    "You are a cautious scientist who values empirical evidence.",
+    "You are an environmental activist concerned about climate change.",
+    "You are an economist who prioritizes economic growth.",
+    "You are a skeptical citizen who questions mainstream narratives."
+  ],
+  "statement": "Governments should prioritize climate policies.",
+  "choices": null,
+  "J": [
+    [
+      0,
+      1,
+      -1,
+      0
+    ],
+    [
+      1,
+      0,
+      1,
+      -1
+    ],
+    [
+      -1,
+      1,
+      0,
+      1
+    ],
+    [
+      0,
+      -1,
+      1,
+      0
+    ]
+  ],
+  "spins_history": [
+    [
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      -1,
+      1,
+      -1,
+      1
+    ],
+    [
+      -1,
+      1,
+      -1,
+      1
+    ],
+    [
+      -1,
+      1,
+      -1,
+      1
+    ],
+    [
+      -1,
+      1,
+      -1,
+      1
+    ],
+    [
+      -1,
+      1,
+      -1,
+      1
+    ],
+    [
+      -1,
+      1,
+      -1,
+      1
+    ],
+    [
+      -1,
+      1,
+      -1,
+      1
+    ],
+    [
+      -1,
+      1,
+      -1,
+      1
+    ]
+  ],
+  "spins_raw_history": [
+    [
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    ],
+    [
+      [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    ],
+    [
+      [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    ],
+    [
+      [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    ],
+    [
+      [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    ],
+    [
+      [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    ],
+    [
+      [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    ],
+    [
+      [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    ],
+    [
+      [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    ]
+  ],
+  "messages_history": [
+    {
+      "0,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "0,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,0": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,3": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,0": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,3": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "3,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "3,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction."
+    },
+    {
+      "0,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "0,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,0": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,3": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,0": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,3": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "3,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "3,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction."
+    },
+    {
+      "0,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "0,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,0": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,3": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,0": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,3": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "3,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "3,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction."
+    },
+    {
+      "0,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "0,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,0": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,3": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,0": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,3": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "3,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "3,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction."
+    },
+    {
+      "0,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "0,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,0": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,3": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,0": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,3": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "3,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "3,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction."
+    },
+    {
+      "0,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "0,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,0": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,3": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,0": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,3": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "3,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "3,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction."
+    },
+    {
+      "0,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "0,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,0": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,3": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,0": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,3": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "3,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "3,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction."
+    },
+    {
+      "0,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "0,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,0": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "1,3": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,0": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "2,3": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "3,1": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction.",
+      "3,2": "Speaking for my persona, here is how I see the statement. The considerations that matter most to me point in a clear direction."
+    }
+  ]
+}

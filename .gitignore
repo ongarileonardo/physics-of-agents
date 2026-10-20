@@ -7,3 +7,6 @@ __pycache__/
 .ipynb_checkpoints/
 **/clean_runs.json
 **/.DS_Store
+**/lib
+**/bin
+**/pyvenv.cfg
