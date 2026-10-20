@@ -49,7 +49,7 @@ def make_openai_pi(
                     **({"extra_body": extra_body} if extra_body else {}),
                 )
                 return resp.choices[0].message.content or ""
-            except (RateLimitError, APIConnectionError, APIError) as exc:
+            except (TypeError, RateLimitError, APIConnectionError, APIError) as exc:
                 last_exc = exc
                 if attempt == max_retries:
                     break
@@ -223,7 +223,7 @@ def make_openrouter_pi(
     model: str,
     temperature: float = 0.7,
     max_output_tokens: int = 256,
-    max_retries: int = 4,
+    max_retries: int = 10,
     api_key: str | None = None,
     extra_body: dict | None = None,
 ) -> Pi:
