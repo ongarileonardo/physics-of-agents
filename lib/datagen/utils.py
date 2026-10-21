@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import os
 import time
+import random
 
 from .samplers import Pi
 from openrouter import OpenRouter
@@ -219,32 +220,32 @@ def make_mock_pi(seed: int = 0) -> Pi:
 
     return pi
 
-# def make_openrouter_pi(
-#     model: str,
-#     temperature: float = 0.7,
-#     max_output_tokens: int = 256,
-#     max_retries: int = 10,
-#     api_key: str | None = None,
-#     extra_body: dict | None = None,
-# ) -> Pi:
-#     """`Pi` via OpenRouter's OpenAI-compatible endpoint."""
-#     if api_key is None:
-#         api_key = os.environ.get("OPENROUTER_API_KEY")
-#         if api_key is None:
-#             raise RuntimeError(
-#                 "OPENROUTER_API_KEY is not set. Export it or pass api_key=... "
-#                 "to make_openrouter_pi."
-#             )
+def make_openrouter_openai_pi(
+    model: str,
+    temperature: float = 0.7,
+    max_output_tokens: int = 256,
+    max_retries: int = 10,
+    api_key: str | None = None,
+    extra_body: dict | None = None,
+) -> Pi:
+    """`Pi` via OpenRouter's OpenAI-compatible endpoint."""
+    if api_key is None:
+        api_key = os.environ.get("OPENROUTER_API_KEY")
+        if api_key is None:
+            raise RuntimeError(
+                "OPENROUTER_API_KEY is not set. Export it or pass api_key=... "
+                "to make_openrouter_pi."
+            )
 
-#     return make_openai_pi(
-#         model=model,
-#         temperature=temperature,
-#         max_output_tokens=max_output_tokens,
-#         max_retries=max_retries,
-#         base_url=OPENROUTER_BASE_URL,
-#         api_key=api_key,
-#         extra_body=extra_body,
-#     )
+    return make_openai_pi(
+        model=model,
+        temperature=temperature,
+        max_output_tokens=max_output_tokens,
+        max_retries=max_retries,
+        base_url=OPENROUTER_BASE_URL,
+        api_key=api_key,
+        extra_body=extra_body,
+    )
 
 def make_openrouter_pi(
     model: str,
@@ -254,27 +255,59 @@ def make_openrouter_pi(
     api_key: str | None = None,
     extra_body: dict | None = None,
 ) -> Pi:
-    """Create a prompt-to-response callable using OpenRouter."""
+    """Create a prompt-to-response callable using OpenRouter's Python SDK."""
+    print("random")
+    if api_key is None:
+        api_key = os.environ.get("OPENROUTER_API_KEY")
 
-    api_key = api_key or os.environ.get("OPENROUTER_API_KEY")
     if not api_key:
-        raise RuntimeError("OPENROUTER_API_KEY is not set.")
+        raise RuntimeError(
+            "OPENROUTER_API_KEY is not set. Export it or pass api_key=..."
+        )
 
     client = OpenRouter(api_key=api_key)
 
     def pi(prompt: str) -> str:
-        response = client.chat.send(
-            model=model,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=temperature,
-            max_tokens=max_output_tokens,
-            stream=False,
-            **(extra_body or {}),
-        )
+        last_exc: Exception | None = None
 
-        # Adjust this extraction if your installed SDK returns a
-        # different response structure.
-        return response.choices[0].message.content or ""
+        for attempt in range(max_retries + 1):
+            try:
+                kwargs = {
+                    "model": model,
+                    "messages": [
+                        {"role": "user", "content": prompt}
+                    ],
+                    "temperature": temperature,
+                    "max_tokens": max_output_tokens,
+                    "stream": False,
+                }
 
-    print("ok")
+                if extra_body:
+                    kwargs.update(extra_body)
+
+                response = client.chat.send(**kwargs)
+
+                content = response.choices[0].message.content
+                if not content:
+                    raise RuntimeError(
+                        f"OpenRouter returned an empty response for {model!r}"
+                    )
+
+                return content
+
+            except Exception as exc:
+                last_exc = exc
+
+                if attempt == max_retries:
+                    break
+
+                # Exponential backoff with jitter.
+                delay = min(2.0 ** attempt, 30.0)
+                time.sleep(delay + random.uniform(0, 1))
+
+        raise RuntimeError(
+            f"OpenRouter call failed after {max_retries + 1} attempts: "
+            f"{last_exc}"
+        ) from last_exc
+
     return pi
