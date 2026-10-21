@@ -7,7 +7,7 @@ import os
 import time
 
 from .samplers import Pi
-from google import genai
+from openrouter import OpenRouter
 
 TOGETHER_BASE_URL = "https://api.together.xyz/v1"
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
@@ -219,6 +219,33 @@ def make_mock_pi(seed: int = 0) -> Pi:
 
     return pi
 
+# def make_openrouter_pi(
+#     model: str,
+#     temperature: float = 0.7,
+#     max_output_tokens: int = 256,
+#     max_retries: int = 10,
+#     api_key: str | None = None,
+#     extra_body: dict | None = None,
+# ) -> Pi:
+#     """`Pi` via OpenRouter's OpenAI-compatible endpoint."""
+#     if api_key is None:
+#         api_key = os.environ.get("OPENROUTER_API_KEY")
+#         if api_key is None:
+#             raise RuntimeError(
+#                 "OPENROUTER_API_KEY is not set. Export it or pass api_key=... "
+#                 "to make_openrouter_pi."
+#             )
+
+#     return make_openai_pi(
+#         model=model,
+#         temperature=temperature,
+#         max_output_tokens=max_output_tokens,
+#         max_retries=max_retries,
+#         base_url=OPENROUTER_BASE_URL,
+#         api_key=api_key,
+#         extra_body=extra_body,
+#     )
+
 def make_openrouter_pi(
     model: str,
     temperature: float = 0.7,
@@ -227,21 +254,27 @@ def make_openrouter_pi(
     api_key: str | None = None,
     extra_body: dict | None = None,
 ) -> Pi:
-    """`Pi` via OpenRouter's OpenAI-compatible endpoint."""
-    if api_key is None:
-        api_key = os.environ.get("OPENROUTER_API_KEY")
-        if api_key is None:
-            raise RuntimeError(
-                "OPENROUTER_API_KEY is not set. Export it or pass api_key=... "
-                "to make_openrouter_pi."
-            )
+    """Create a prompt-to-response callable using OpenRouter."""
 
-    return make_openai_pi(
-        model=model,
-        temperature=temperature,
-        max_output_tokens=max_output_tokens,
-        max_retries=max_retries,
-        base_url=OPENROUTER_BASE_URL,
-        api_key=api_key,
-        extra_body=extra_body,
-    )
+    api_key = api_key or os.environ.get("OPENROUTER_API_KEY")
+    if not api_key:
+        raise RuntimeError("OPENROUTER_API_KEY is not set.")
+
+    client = OpenRouter(api_key=api_key)
+
+    def pi(prompt: str) -> str:
+        response = client.chat.send(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=temperature,
+            max_tokens=max_output_tokens,
+            stream=False,
+            **(extra_body or {}),
+        )
+
+        # Adjust this extraction if your installed SDK returns a
+        # different response structure.
+        return response.choices[0].message.content or ""
+
+    print("ok")
+    return pi

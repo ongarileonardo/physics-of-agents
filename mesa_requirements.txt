@@ -24,3 +24,5 @@ jinja2==3.1.2
 
 # Agent-based modeling and visualization
 mesa[rec]==3.3.1
+
+openrouter
