@@ -256,7 +256,6 @@ def make_openrouter_pi(
     extra_body: dict | None = None,
 ) -> Pi:
     """Create a prompt-to-response callable using OpenRouter's Python SDK."""
-    print("random")
     if api_key is None:
         api_key = os.environ.get("OPENROUTER_API_KEY")
 

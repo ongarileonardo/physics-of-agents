@@ -1,0 +1,225 @@
+{
+  "meta": {
+    "name": "climate_replica_deepseekdeepseek_0",
+    "n": 4,
+    "num_steps": 6,
+    "k": 1,
+    "mode": "subjective"
+  },
+  "personas": [
+    "You are a cautious scientist who values empirical evidence.",
+    "You are an economist who prioritizes economic growth.",
+    "You are an enviornmental activist who cares about climate change.",
+    "You are a skeptical citizen who questions mainstream narratives."
+  ],
+  "statement": "Governments should prioritize climate policies.",
+  "choices": null,
+  "J": [
+    [
+      0,
+      1,
+      -1,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      -1,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      0,
+      0,
+      0
+    ]
+  ],
+  "spins_history": [
+    [
+      1,
+      -1,
+      1,
+      -1
+    ],
+    [
+      -1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      -1,
+      1,
+      -1
+    ],
+    [
+      -1,
+      -1,
+      1,
+      1
+    ],
+    [
+      1,
+      -1,
+      1,
+      -1
+    ],
+    [
+      -1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      -1,
+      1,
+      -1
+    ]
+  ],
+  "spins_raw_history": [
+    [
+      [
+        1
+      ],
+      [
+        -1
+      ],
+      [
+        1
+      ],
+      [
+        -1
+      ]
+    ],
+    [
+      [
+        -1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    [
+      [
+        1
+      ],
+      [
+        -1
+      ],
+      [
+        1
+      ],
+      [
+        -1
+      ]
+    ],
+    [
+      [
+        -1
+      ],
+      [
+        -1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    [
+      [
+        1
+      ],
+      [
+        -1
+      ],
+      [
+        1
+      ],
+      [
+        -1
+      ]
+    ],
+    [
+      [
+        -1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    [
+      [
+        1
+      ],
+      [
+        -1
+      ],
+      [
+        1
+      ],
+      [
+        -1
+      ]
+    ]
+  ],
+  "messages_history": [
+    {
+      "0": "I think governments should prioritize climate policies because the empirical evidence consistently indicates significant and accelerating climate-related risks, and credible evidence shows well-designed policies can reduce those risks. Given remaining uncertainties, prioritizing action now is the prudent, evidence-based choice.",
+      "1": "I don’t think governments should prioritize climate policies above economic growth, because costly near-term decarbonization can suppress investment, productivity, and job creation—especially in developing economies. Climate action is better pursued through gradual, technology-neutral measures that preserve the growth needed to fund innovation and adaptation.",
+      "2": "Governments absolutely should prioritize climate policies, because the science is clear that we’re running out of time to avoid the worst impacts of climate change. If we don’t make this the top political priority now, the costs to people and ecosystems will only become far more devastating and expensive to address later.",
+      "3": "I don’t think governments should put climate policies at the top of the list, because these policies are often sold with alarmist claims that justify more control over our lives and wallets. We should focus on concrete local problems and let people adapt without letting bureaucrats and green industries dictate the agenda."
+    },
+    {
+      "0": "I don’t think governments should prioritize climate policies above all else, because the empirical evidence suggests that abrupt, costly decarbonization can impose near-term economic costs that undermine the investment and innovation needed for long-run adaptation. A more evidence-based approach is gradual, technology-neutral policy that explicitly weighs tradeoffs and preserves growth.",
+      "1": "I agree governments should prioritize climate policies, but for me the case is fundamentally about growth: well-designed policy reduces accelerating climate risks that would otherwise undermine investment, productivity, and long-run economic capacity. Prioritizing credible, market-based climate measures now is the prudent pro-growth choice, not a distraction from it.",
+      "2": "I completely agree that governments should prioritize climate policies—we’re already seeing accelerating climate risks, and delaying action only makes the crisis harder and costlier to address. Prioritizing well-designed climate policy now is the responsible, evidence-based choice to protect people and ecosystems.",
+      "3": "I’m usually wary of mainstream narratives, but the evidence on accelerating climate risks is strong enough that governments should prioritize climate policies. Even with remaining uncertainties, acting now is the prudent, evidence-based choice rather than waiting."
+    },
+    {
+      "0": "I think governments should prioritize climate policies because the empirical evidence on accelerating climate risks is strong enough that waiting looks like the riskier choice, even with remaining uncertainties. Well-designed action now is the prudent, evidence-based way to reduce those risks rather than defer them.",
+      "1": "I don’t think governments should prioritize climate policies above all else, because abrupt, costly decarbonization can impose near-term economic costs that undermine the investment and innovation needed for long-run adaptation. A more evidence-based approach is gradual, technology-neutral policy that explicitly weighs tradeoffs and preserves growth.",
+      "2": "I strongly believe governments should prioritize climate policies, because the climate crisis is an urgent existential threat and delaying action only makes the costs and harms worse. Prioritizing decarbonization now protects people and ecosystems while building a more resilient, fair economy for the future.",
+      "3": "I don’t think governments should put climate policy above everything else, because the evidence suggests abrupt, costly decarbonization can impose near-term economic costs that undermine the investment and innovation needed for long-run adaptation. We should favor gradual, technology-neutral policies that openly weigh tradeoffs and preserve growth"
+    },
+    {
+      "0": "I disagree that governments should prioritize climate policies above all else, because the empirical evidence suggests abrupt, costly decarbonization can impose near-term economic costs that undermine the investment and innovation needed for long-run adaptation. A more defensible approach is gradual, technology-neutral policy that openly weighs tradeoffs and preserves growth.",
+      "1": "I don’t think governments should prioritize climate policies, because our first-order objective should be sustaining robust economic growth and the opportunity it creates. Climate measures can be pursued where they are cost-effective, but elevating them above growth risks slower productivity and higher costs.",
+      "2": "I strongly believe governments must prioritize climate policies now, because the science shows climate risks are accelerating and delaying action only makes the crisis more dangerous and costly. We have a moral duty to protect communities and ecosystems, and prioritizing climate policy is the most responsible way to secure a livable future.",
+      "3": "I’m usually skeptical of sweeping mainstream claims, but I think governments should prioritize climate policies because the evidence on accelerating climate risks is strong enough that delay looks like the riskier bet even with remaining uncertainties. Well-designed action now is the prudent, evidence-based way to reduce those risks rather than defer them."
+    },
+    {
+      "0": "I think governments should prioritize climate policies, not because every detail is settled but because the empirical evidence on accelerating climate risks is strong enough that delay looks like the riskier bet. Well-designed action now is the prudent, evidence-based way to manage remaining uncertainties and reduce costly future risks.",
+      "1": "I don’t think governments should prioritize climate policies above all else, because abrupt, costly decarbonization can impose near-term economic costs that undermine the investment and innovation needed for long-run adaptation. A more defensible approach is gradual, technology-neutral policy that openly weighs tradeoffs and preserves growth.",
+      "2": "Governments absolutely should prioritize climate policies, because the science is clear that delaying action locks in worse warming, more extreme disasters, and far higher long-term costs. Treating climate as a secondary issue ignores the urgency of protecting people and ecosystems now while building a fair, resilient future.",
+      "3": "I don’t think governments should put climate policy above everything else, because rushing costly decarbonization can hit the economy now and undercut the investment and innovation we’ll need to adapt later. We’re better off with gradual, technology-neutral policies that openly weigh tradeoffs and protect growth instead of treating climate as the sole priority."
+    },
+    {
+      "0": "I don’t think governments should prioritize climate policy above all else, because the evidence doesn’t justify treating one priority as absolute when abrupt, costly decarbonization could impose near-term economic harms and weaken the investment and innovation needed for adaptation. A more defensible approach is gradual, technology-neutral policy that openly weighs tradeoffs and preserves growth while still addressing climate risks.",
+      "1": "Prioritizing climate policies is the growth-oriented choice, since unchecked climate risks threaten the long-run investment, productivity, and stability that growth depends on. Well-designed action now reduces costly future disruptions and uncertainty, making it the prudent way to protect sustained economic growth.",
+      "2": "I think governments absolutely should prioritize climate policies—the evidence on accelerating climate risks is strong enough that delay is the riskier bet. Well-designed action now is the prudent way to manage uncertainty and avoid much costlier future harms.",
+      "3": "I’m usually the last person to trust a consensus narrative, but on climate the evidence on accelerating risks is strong enough that waiting looks like the riskier bet. That’s why I think governments should prioritize climate policies now—not because every detail is settled, but because well-designed action is the prudent way to manage the uncertainty."
+    }
+  ]
+}

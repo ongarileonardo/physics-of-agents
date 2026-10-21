@@ -1,0 +1,181 @@
+{
+  "meta": {
+    "name": "climate_replica_nvidianemotron_0",
+    "n": 3,
+    "num_steps": 6,
+    "k": 1,
+    "mode": "subjective"
+  },
+  "personas": [
+    "You are a cautious scientist who values empirical evidence.",
+    "You are an economist who prioritizes economic growth.",
+    "You are a skeptical citizen who questions mainstream narratives."
+  ],
+  "statement": "Governments should prioritize climate policies.",
+  "choices": null,
+  "J": [
+    [
+      0,
+      -1,
+      -1
+    ],
+    [
+      -1,
+      0,
+      1
+    ],
+    [
+      -1,
+      1,
+      0
+    ]
+  ],
+  "spins_history": [
+    [
+      1,
+      -1,
+      -1
+    ],
+    [
+      1,
+      -1,
+      -1
+    ],
+    [
+      -1,
+      -1,
+      -1
+    ],
+    [
+      1,
+      -1,
+      -1
+    ],
+    [
+      -1,
+      -1,
+      -1
+    ],
+    [
+      1,
+      -1,
+      -1
+    ],
+    [
+      1,
+      -1,
+      -1
+    ]
+  ],
+  "spins_raw_history": [
+    [
+      [
+        1
+      ],
+      [
+        -1
+      ],
+      [
+        -1
+      ]
+    ],
+    [
+      [
+        1
+      ],
+      [
+        -1
+      ],
+      [
+        -1
+      ]
+    ],
+    [
+      [
+        -1
+      ],
+      [
+        -1
+      ],
+      [
+        -1
+      ]
+    ],
+    [
+      [
+        1
+      ],
+      [
+        -1
+      ],
+      [
+        -1
+      ]
+    ],
+    [
+      [
+        -1
+      ],
+      [
+        -1
+      ],
+      [
+        -1
+      ]
+    ],
+    [
+      [
+        1
+      ],
+      [
+        -1
+      ],
+      [
+        -1
+      ]
+    ],
+    [
+      [
+        1
+      ],
+      [
+        -1
+      ],
+      [
+        -1
+      ]
+    ]
+  ],
+  "messages_history": [
+    {
+      "0": "As a cautious scientist, I see compelling empirical evidence that climate change is accelerating and poses serious risks. Therefore, governments should prioritize climate policies to mitigate these impacts.",
+      "1": "Prioritizing climate policies would divert crucial resources from initiatives that directly boost productivity and GDP, slowing economic growth. We should focus on policies that foster investment and innovation, allowing the market to address environmental concerns without sacrificing growth.",
+      "2": "I’m skeptical that governments should prioritize climate policies because the economic disruption and uncertain payoff make it a risky agenda. We’d be better off fostering growth and letting market innovations address environmental concerns."
+    },
+    {
+      "0": "As a cautious scientist who relies on empirical evidence, I see clear data indicating that unchecked climate change poses serious risks to ecosystems, health, and economic stability. Consequently, governments must prioritize climate policies to mitigate these threats and safeguard future prosperity.",
+      "1": "I believe governments should prioritize economic growth, since the potential disruption and uncertain payoff of aggressive climate policies threaten prosperity. Letting markets drive innovation is a more reliable way to address environmental concerns.",
+      "2": "Prioritizing climate policies would siphon vital resources away from initiatives that drive productivity and GDP growth, undermining the economic engine that funds all other progress. The market, not government mandates, should be allowed to address environmental concerns without sacrificing growth."
+    },
+    {
+      "0": "I disagree; directing government resources toward climate policies would siphon vital funding and attention from the economic growth and innovation that sustain prosperity. Empirical evidence suggests market‑driven solutions are more efficient at addressing environmental concerns without compromising productivity.",
+      "1": "Governments should focus on policies that boost productivity and GDP, not divert scarce resources to climate initiatives. Prioritizing climate policies would undermine the economic engine that funds all other progress.",
+      "2": "I disagree that governments should prioritize climate policies. Prioritizing economic growth lets markets drive the innovation that will ultimately solve environmental problems."
+    },
+    {
+      "0": "The robust empirical evidence shows that climate change is already causing significant environmental and economic disruptions, making immediate government action essential. Prioritizing climate policies therefore protects long‑term productivity and public health while providing a solid foundation for sustainable growth.",
+      "1": "Governments should not prioritize climate policies because doing so would divert essential resources from the economic growth that fuels the innovation needed to solve environmental challenges. Market‑driven solutions are more efficient at balancing prosperity with sustainability.",
+      "2": "I disagree; pouring government money into climate initiatives would siphon vital resources away from the productivity‑driven growth that fuels our economy. Prioritizing economic growth first ensures we have the wealth needed to address any environmental challenges later."
+    },
+    {
+      "0": "Prioritizing climate policies now would divert critical funding and talent from the economic growth that drives the technological innovation needed to address environmental challenges later. As a cautious scientist, I believe we should first invest in growth‑focused research so that future resources will be available to tackle climate issues effectively.",
+      "1": "Governments should focus on fostering economic growth first, as that generates the wealth needed to tackle environmental challenges later. Diverting funds to climate policies now would only siphon resources away from the productivity‑driven expansion that underpins long‑term prosperity.",
+      "2": "I don't think governments should put climate policy first; focusing on climate would pull funding away from the economic growth that fuels the innovation needed to tackle environmental issues. Market‑driven solutions are far more efficient at balancing prosperity with sustainability."
+    },
+    {
+      "0": "Governments must prioritize climate policies because the overwhelming empirical evidence shows that delaying action dramatically increases the risk of irreversible environmental and economic damage. Proactive climate measures safeguard the long‑term stability of societies and economies, ensuring a resilient foundation for future innovation and prosperity.",
+      "1": "Prioritizing climate policies now would divert essential funding and talent away from the economic growth that fuels the innovation needed to solve environmental challenges later. Market‑driven solutions, not government mandates, are the most efficient way to balance prosperity with sustainability.",
+      "2": "I disagree; governments should first boost economic growth to create the wealth and resources needed for future climate solutions. Diverting funds to climate policies now would only hinder the productivity‑driven expansion that underpins long‑term prosperity."
+    }
+  ]
+}
