@@ -6,6 +6,7 @@ import hashlib
 import os
 import time
 import random
+import threading
 
 from .samplers import Pi
 from openrouter import OpenRouter
@@ -59,7 +60,6 @@ def make_openai_pi(
 
     return pi
 
-
 def make_together_pi(
     model: str = "meta-llama/Meta-Llama-3-8B-Instruct-Lite",
     temperature: float = 0.7,
@@ -112,27 +112,6 @@ def make_aihubmix_pi(
         extra_body=extra_body,
     )
 
-# def make_aihubmix_pi(model: str, temperature: float):
-#     client = OpenAI(
-#         api_key=os.environ["AIHUBMIX_API_KEY"],
-#         base_url="https://aihubmix.com/v1",
-#     )
-
-#     def pi(messages):
-#         response = client.chat.completions.create(
-#             model=model,
-#             messages=messages,
-#             temperature=temperature,
-#             max_tokens=1024,
-#         )
-#         return response.choices[0].message.content
-
-#     return pi
-
-import time
-import threading
-
-
 def make_gemini_pi(
     model: str,
     temperature: float = 0.7,
@@ -176,31 +155,6 @@ def make_gemini_pi(
         return response.text
 
     return pi
-
-# def make_gemini_pi(
-#     model: str = "gemini-3.5-flash-lite",
-#     temperature: float = 0.7,
-# ):
-#     api_key = os.getenv("GEMINI_API_KEY")
-#     if not api_key:
-#         raise RuntimeError(
-#             "GEMINI_API_KEY is not set. Export it before running."
-#         )
-
-#     client = genai.Client(api_key=api_key)
-
-#     def pi(prompt: str) -> str:
-#         response = client.models.generate_content(
-#             model=model,
-#             contents=prompt,
-#             config={
-#                 "temperature": temperature,
-#             },
-#         )
-#         return response.text
-
-#     return pi
-
 
 def make_mock_pi(seed: int = 0) -> Pi:
     """Deterministic offline `Pi` for smoke tests (hash-based answers, canned message)."""
@@ -251,7 +205,7 @@ def make_openrouter_pi(
     model: str,
     temperature: float = 0.7,
     max_output_tokens: int = 256,
-    max_retries: int = 10,
+    max_retries: int = 5,
     api_key: str | None = None,
     extra_body: dict | None = None,
 ) -> Pi:

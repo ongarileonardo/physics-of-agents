@@ -87,6 +87,7 @@ def _objective_context(persona: str, question: str, choices: Dict[str, str],
     )
 
 
+# @TODO ATTENTION! This compromises the message phase creating opinions that do not exist
 def _stance_sign(current_spin: int) -> int:
     """Spin -> +/-1 for the message phase; an undecided 0 is broken at random."""
     if current_spin > 0:
@@ -121,6 +122,43 @@ def spin_sampler(
     user_prompt = (
         _subjective_context(persona, question, messages_agree, messages_disagree)
         + f"# Instruction\n"
+        f"Given this background, is your persona currently more likely to AGREE or "
+        f"DISAGREE with the statement?\n"
+        f"## Response Format\n"
+        f"Respond with exactly one word: AGREE or DISAGREE."
+    )
+    return _parse_spin_subjective(pi(user_prompt))
+
+def spin_sampler_stateful(
+    persona: str,
+    question: str,
+    messages_agree: List[str],
+    messages_disagree: List[str],
+    pi: Pi,
+    current_spin: int,
+    *,
+    mode: str = "subjective",
+    choices: Optional[Dict[str, str]] = None,
+) -> int:
+    """Sample a binary spin in {+1, -1}: AGREE/DISAGREE (subjective) or A/B
+    (objective; ``choices`` with keys "A"/"B" required)."""
+    if mode == "objective":
+        if choices is None:
+            raise ValueError("objective mode requires `choices` for spin_sampler")
+        letter = "A" if _stance_sign(current_spin) > 0 else "B"
+        user_prompt = (
+            _objective_context(persona, question, choices,
+                               messages_agree, messages_disagree)
+            + f"Your current answer to the problem is {letter}."
+            + OBJECTIVE_SPIN_INSTRUCTION
+        )
+        return _parse_spin_objective(pi(user_prompt))
+
+    stance = "AGREES with" if _stance_sign(current_spin) > 0 else "DISAGREES with"
+    user_prompt = (
+        _subjective_context(persona, question, messages_agree, messages_disagree)
+        + f"# Instruction\n"
+        f"Your persona currently {stance} the statement."
         f"Given this background, is your persona currently more likely to AGREE or "
         f"DISAGREE with the statement?\n"
         f"## Response Format\n"

@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 from tqdm.auto import tqdm
 
-from .samplers import Pi, message_sampler, spin_sampler
+from .samplers import Pi, message_sampler, spin_sampler, spin_sampler_stateful
 
 
 @dataclass
@@ -67,6 +67,7 @@ def _spin_call_with_retry(
     agree: List[str],
     disagree: List[str],
     pi: Pi,
+    current_spin: int,
     mode: str = "subjective",
     choices: Optional[Dict[str, str]] = None,
     parse_retries: int = 2,
@@ -74,8 +75,8 @@ def _spin_call_with_retry(
     """spin_sampler with parse retries; 0 on persistent failure."""
     for _ in range(parse_retries + 1):
         try:
-            return spin_sampler(persona, statement, agree, disagree, pi,
-                                mode=mode, choices=choices)
+            return spin_sampler_stateful(persona, statement, agree, disagree, pi,
+                                current_spin=current_spin, mode=mode, choices=choices)
         except ValueError:
             continue
     return 0
@@ -175,6 +176,11 @@ def _run_spin_phase(
     """Sample k spins per (replica, agent) and aggregate to S(t) by majority."""
     fut_meta: Dict[Future, Tuple[int, int, int]] = {}
     for r_idx, rep in enumerate(replicas):
+        current_spins = (
+            rep.spins_history[-1]
+            if rep.spins_history
+            else [0] * rep.n
+        )
         for a_idx in range(rep.n):
             agree = rep.inbox_agree[a_idx] if use_inbox else []
             disagree = rep.inbox_disagree[a_idx] if use_inbox else []
@@ -186,6 +192,7 @@ def _run_spin_phase(
                     agree,
                     disagree,
                     pi,
+                    int(current_spins[a_idx]),
                     rep.mode,
                     rep.choices,
                 )
