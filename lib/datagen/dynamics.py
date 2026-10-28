@@ -75,8 +75,8 @@ def _spin_call_with_retry(
     """spin_sampler with parse retries; 0 on persistent failure."""
     for _ in range(parse_retries + 1):
         try:
-            return spin_sampler_stateful(persona, statement, agree, disagree, pi,
-                                current_spin=current_spin, mode=mode, choices=choices)
+            return spin_sampler(persona, statement, agree, disagree, pi,
+                                mode=mode, choices=choices)
         except ValueError:
             continue
     return 0

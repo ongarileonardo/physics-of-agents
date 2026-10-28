@@ -9,6 +9,7 @@ import json
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+import logging
 
 import numpy as np
 
@@ -206,6 +207,11 @@ def main() -> None:
     if args.num_edges % 2 != 0:
         raise ValueError(f"--num-edges must be even, got {args.num_edges}")
 
+    logging.basicConfig(
+        level=logging.ERROR,
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    )
+
     backend = resolve_backend(args.model, args.backend)
 
     # Mode-specific defaults (data/<subj|obj>/...).
@@ -229,6 +235,7 @@ def main() -> None:
                 f"{len(missing)} (e.g. {missing[:3]})"
             )
 
+    # build graph based on num-edges parameter 
     # train_graphs, test_graphs, seen_ids = build_graph_bank(
     #     n=args.num_agents,
     #     num_train_graphs=args.num_train_graphs,
@@ -242,6 +249,7 @@ def main() -> None:
     #     include_lattices=not args.no_lattices,
     # )
 
+    # build fixed graph J0 from paper example
     J0 = np.array([
         [0,0,0,-1,-1,0,0,0,0,0,0,0,-1,0,-1,0,0,0,0,0,-1,0,0,0,0,0,0,1,1,0,0,0],
         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0],
@@ -338,6 +346,7 @@ def main() -> None:
         pi = make_openrouter_pi(
             model=args.model,
             temperature=args.temperature,
+            max_output_tokens=1024,
         )
     else:
         pi = make_openai_pi(

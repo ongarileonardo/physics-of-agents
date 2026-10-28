@@ -7,6 +7,7 @@ import os
 import time
 import random
 import threading
+import logging
 
 from .samplers import Pi
 from openrouter import OpenRouter
@@ -14,6 +15,7 @@ from openrouter import OpenRouter
 TOGETHER_BASE_URL = "https://api.together.xyz/v1"
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
+logger = logging.getLogger(__name__)
 
 def make_openai_pi(
     model: str = "gpt-4o-mini",
@@ -240,13 +242,71 @@ def make_openrouter_pi(
 
                 response = client.chat.send(**kwargs)
 
-                content = response.choices[0].message.content
-                if not content:
+                choices = getattr(response, "choices", None) or []
+                usage = getattr(response, "usage", None)
+
+                # Handle missing choices instead of crashing with IndexError.
+                if not choices:
+                    logger.warning(
+                        "OpenRouter returned no choices. "
+                        "model=%s attempt=%d/%d usage=%r response=%r",
+                        model,
+                        attempt + 1,
+                        max_retries + 1,
+                        usage,
+                        response,
+                    )
                     raise RuntimeError(
-                        f"OpenRouter returned an empty response for {model!r}"
+                        f"OpenRouter returned no choices for {model!r}"
                     )
 
-                return content
+                choice = choices[0]
+                message = getattr(choice, "message", None)
+
+                content = (
+                    getattr(message, "content", None)
+                    if message is not None
+                    else None
+                )
+
+                if isinstance(content, str) and content.strip():
+                    return content
+
+                # Log diagnostics only when the response has no usable text.
+                logger.warning(
+                    "OpenRouter returned empty content. "
+                    "model=%s attempt=%d/%d "
+                    "finish_reason=%r usage=%r "
+                    "content=%r refusal=%r reasoning=%r "
+                    "tool_calls=%r message=%r response=%r",
+                    model,
+                    attempt + 1,
+                    max_retries + 1,
+                    getattr(choice, "finish_reason", None),
+                    usage,
+                    content,
+                    getattr(message, "refusal", None),
+                    getattr(message, "reasoning", None),
+                    getattr(message, "tool_calls", None),
+                    message,
+                    response,
+                )
+
+                finish_reason = getattr(choice, "finish_reason", None)
+
+                # Empty content is not necessarily a transient API error.
+                raise RuntimeError(
+                    f"OpenRouter returned empty content for {model!r}; "
+                    f"finish_reason={finish_reason!r}; usage={usage!r}"
+                )
+            
+                # content = response.choices[0].message.content
+                # if not content:
+                #     raise RuntimeError(
+                #         f"OpenRouter returned an empty response for {model!r}"
+                #     )
+
+                # return content
 
             except Exception as exc:
                 last_exc = exc
@@ -256,6 +316,19 @@ def make_openrouter_pi(
 
                 # Exponential backoff with jitter.
                 delay = min(2.0 ** attempt, 30.0)
+
+                logger.warning(
+                    "OpenRouter call failed. "
+                    "model=%s attempt=%d/%d error_type=%s error=%s "
+                    "retry_in=%.2fs",
+                    model,
+                    attempt + 1,
+                    max_retries + 1,
+                    type(exc).__name__,
+                    exc,
+                    delay,
+                )
+
                 time.sleep(delay + random.uniform(0, 1))
 
         raise RuntimeError(
