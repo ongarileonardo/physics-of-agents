@@ -4,7 +4,8 @@ one output JSON per replica."""
 from __future__ import annotations
 
 import json
-import random
+import random, time
+import logging
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -15,6 +16,7 @@ from tqdm.auto import tqdm
 
 from .samplers import Pi, message_sampler, spin_sampler, spin_sampler_stateful
 
+logger = logging.getLogger(__name__)
 
 @dataclass
 class Replica:
@@ -70,15 +72,31 @@ def _spin_call_with_retry(
     current_spin: int,
     mode: str = "subjective",
     choices: Optional[Dict[str, str]] = None,
-    parse_retries: int = 2,
+    parse_retries: int = 3,
 ) -> int:
     """spin_sampler with parse retries; 0 on persistent failure."""
-    for _ in range(parse_retries + 1):
+    
+    jitter = random.uniform(0, 2)
+    
+    for attempt in range(parse_retries + 1):
         try:
+            delay = min(2.0 ** attempt, 30.0)
+            jitter = random.uniform(0,2)
+            time.sleep(delay + jitter)
             return spin_sampler(persona, statement, agree, disagree, pi,
                                 mode=mode, choices=choices)
-        except ValueError:
+        except ValueError as e:
+            logger.warning(
+                "spin_sampler failed on attempt %d/%d: %s",
+                attempt + 1,
+                parse_retries + 1,
+                e,
+            )
             continue
+
+    logger.error(
+        "Could not parse spin from OpenRouter",
+    )
     return 0
 
 

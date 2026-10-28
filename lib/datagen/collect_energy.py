@@ -347,6 +347,11 @@ def main() -> None:
             model=args.model,
             temperature=args.temperature,
             max_output_tokens=1024,
+            extra_body={
+                "reasoning": {
+                    "effort": "low"
+                }
+            },
         )
     else:
         pi = make_openai_pi(

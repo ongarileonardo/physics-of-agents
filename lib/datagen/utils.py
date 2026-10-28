@@ -316,6 +316,7 @@ def make_openrouter_pi(
 
                 # Exponential backoff with jitter.
                 delay = min(2.0 ** attempt, 30.0)
+                jitter = random.uniform(0, 2)
 
                 logger.warning(
                     "OpenRouter call failed. "
@@ -326,14 +327,26 @@ def make_openrouter_pi(
                     max_retries + 1,
                     type(exc).__name__,
                     exc,
-                    delay,
+                    delay + jitter,
                 )
 
-                time.sleep(delay + random.uniform(0, 1))
+                time.sleep(delay + jitter)
+
+        logger.error(
+            "OpenRouter call failed after %d attempts. "
+            "Exception type=%s, details=%r",
+            max_retries + 1,
+            type(last_exc).__name__,
+            last_exc,
+            exc_info=(
+                type(last_exc),
+                last_exc,
+                last_exc.__traceback__,
+            ),
+        )
 
         raise RuntimeError(
-            f"OpenRouter call failed after {max_retries + 1} attempts: "
-            f"{last_exc}"
+            f"OpenRouter call failed after {max_retries + 1} attempts: {last_exc}"
         ) from last_exc
 
     return pi
