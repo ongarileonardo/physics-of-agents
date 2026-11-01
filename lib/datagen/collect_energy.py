@@ -29,7 +29,8 @@ BACKENDS: Dict[str, str] = {
     "gemini-3.5-flash-lite": "gemini",
     "gemma-4-26b-a4b-it": "gemini",
     "nvidia/nemotron-3.5-lightning:free": "openrouter",
-    "openai/gpt-oss-safeguard-20b": "openrouter"
+    "openai/gpt-oss-safeguard-20b": "openrouter",
+    "deepseek/deepseek-v4.1-flash-1017": "openrouter"
 }
 
 
@@ -349,7 +350,8 @@ def main() -> None:
             max_output_tokens=1024,
             extra_body={
                 "reasoning": {
-                    "effort": "low"
+                    "effort": "low",
+                    "max_tokens": 256,
                 }
             },
         )
