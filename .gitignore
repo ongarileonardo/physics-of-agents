@@ -8,3 +8,4 @@ __pycache__/
 **/clean_runs.json
 **/.DS_Store
 **/pdf
+**/figures
