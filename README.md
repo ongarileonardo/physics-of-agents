@@ -1,49 +1,429 @@
-# Physics of Agents
+# Physics of Agents - Summary
 
-Code for [Physics of Agents: Statistical Mechanics Predicts Collective Behavior of AI Agents](https://arxiv.org/abs/2608.16578).
+## 1. Problem setting and purpose of the paper
 
-Each experiment gives a group of agents a question, a persona for each agent, and a network describing who communicates with whom. The agents express opinions, exchange messages, and update their opinions. The analysis then asks whether simple mathematical rules can predict those updates.
+The paper studies **how opinions of interacting agents change over time**.
 
-![Pipeline from question banks, personas, and interaction graphs through conversation generation and data consolidation to model fitting and figures.](assets/pipeline.png)
+The basic idea is:
 
-```
-lib/                    experiment / generation
-  datagen/              synchronous dynamics (main experiments)
-  datagen_async/        schedule-driven asynchronous dynamics
-  datagen_frontier/     mixed frontier-model dynamics
-  features.py           shared embedding / PCA feature loaders
-  clean_data.ipynb      raw per-episode JSON -> data/clean_runs.json
-  clean_data_seq.ipynb  raw async JSON      -> data/clean_runs_seq.json
-data/                   question banks, personas, raw episodes, consolidated runs
-res/                    analysis notebooks (figures and prediction tables)
-  utils.py              shared analysis library (loading, features, fits, metrics)
-online_appendix/        static browser for the message-level data
-```
+* We have a group of **agents**.
+* Each agent has a **persona**, which describes who they are and provides their initial context for answering a question.
+* The agents are asked a **question/statement** and have an opinion about it.
+* Agents can **communicate with each other** by sending messages.
+* After receiving messages from other agents, an agent can **change its opinion**.
+* This process is repeated for several rounds.
 
-See [implementation_details.md](implementation_details.md) for the code and data guide, and [reproducibility_audit.md](reproducibility_audit.md) for the reproducibility audit.
+The important point is that the paper tries to connect this LLM-based social interaction to ideas from **statistical physics**, such as spins, interactions, and trajectories.
 
-### System Requirements
+In the code, the LLM acts as the agent's decision-making mechanism. It receives the relevant context — persona, question, and messages from other agents — and produces the agent's current opinion.
 
-This code uses Python and the packages listed in [requirements.txt](requirements.txt). The analysis notebooks under res/ use CPU computation and do not require a GPU or other specialized hardware. Generating new language-model responses with the data generation code under lib/ requires access to a language model API. The code has been successfully tested on macOS 26.6.2, Apple Silicon (arm64), Python 3.9.13. 
+So, conceptually:
 
-### Installation Guide
-```bash
-git clone https://github.com/batu-el/physics-of-agents.git
-cd physics-of-agents
+**Persona + question + received messages → agent's opinion → message to other agents → new opinions → ...**
 
-python3 -m venv .venv
-source .venv/bin/activate
+The paper then studies the resulting opinion dynamics using a physics-inspired framework.
 
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-```
+A useful way to think about the experiment is:
 
-Installation takes approximately 5 minutes on a MacBook Pro with an Apple M1 Pro chip and 16 GB RAM. This includes approximately 30 seconds to create a fresh Python environment and download and install dependencies, plus 4 minutes 30 seconds to clone the repository.
+> **We create a controlled social system, let the agents interact, record how their opinions evolve, and then study that evolution using statistical-physics concepts.**
 
-### Demo
-Instructions for running the analysis: The data collected in our study is available under data/. Run the notebooks under res/ to follow the analysis step by step.
+---
 
-Instructions for running data generation: For generating the data, use the files under lib/. The following command will use the first question from the training and test sets for the subjective dataset (`data/subj/train.jsonl`, `data/subj/test.jsonl`). It uses the first four personas from `data/subj/personas.json`, one shared graph, two update rounds, and three opinion samples per
+## 2. Notation and terminology
+
+### Agents
+
+Suppose we have three agents:
+
+$$
+A_1,\ A_2,\ A_3
+$$
+
+We can also simply label them:
+
+$$
+i=1,2,3
+$$
+
+Each agent has a fixed **persona**.
+
+For example:
+
+* Agent 1: environmental activist
+* Agent 2: economist
+* Agent 3: business owner
+
+The persona is part of the agent's background. **It is not the same thing as the agent's current opinion.**
+
+---
+
+### Spins
+
+The agent's current opinion is represented by a **spin**:
+
+$$
+s_i(t) \in \{-1,+1\}
+$$
+
+where:
+
+* \(+1\) might mean **AGREE**
+* \(-1\) might mean **DISAGREE**
+
+The exact meaning depends on the experiment. For an objective question, the two values can instead represent **A/B**.
+
+For example, at time \(t=0\):
+
+$$
+s_1(0)=+1
+$$
+
+means Agent 1 agrees.
+
+And:
+
+$$
+s_2(0)=-1
+$$
+
+means Agent 2 disagrees.
+
+If Agent 2 receives messages and changes its opinion:
+
+$$
+s_2(0)=-1
+$$
+
+could become
+
+$$
+s_2(1)=+1.
+$$
+
+So the **spin changes over time**.
+
+The collection of all agents' spins is the system's state:
+
+$$
+\mathbf{s}(t) =
+(s_1(t),s_2(t),...,s_N(t)).
+$$
+
+---
+
+### Interaction matrix \(J\)
+
+The matrix
+
+$$
+J
+$$
+
+describes **how agents are connected/interact**.
+
+An element
+
+$$
+J_{ij}
+$$
+
+describes the relationship from agent \(i\) to agent \(j\).
+
+In the setup we examined:
+
+* \(J_{ij}=+1\): attractive/agree-type interaction
+* \(J_{ij}=-1\): repulsive/disagree-type interaction
+* \(J_{ij}=0\): no interaction
+
+For example:
+
+$$
+J =
+\begin{pmatrix}
+0 & +1 & -1\\
++1 & 0 & +1\\
+-1 & +1 & 0
+\end{pmatrix}
+$$
+
+means, for example:
+
+* Agent 1 and Agent 2 have a positive interaction.
+* Agent 1 and Agent 3 have a negative interaction.
+* Agent 2 and Agent 3 have a positive interaction.
+
+### Very important distinction
+
+**\(J_{ij}\) does NOT tell us whether the two agents currently agree.**
+
+For example, we could have:
+
+$$
+J_{12}=+1
+$$
+
+but:
+
+$$
+s_1=+1,\qquad s_2=-1.
+$$
+
+So the agents currently disagree, even though their relationship is attractive.
+
+Similarly:
+
+$$
+J_{12}=-1
+$$
+
+doesn't mean they cannot communicate. It means the interaction is treated as repulsive/disagree-type.
+
+Therefore, keep these two ideas separate:
+
+$$
+\boxed{\text{current opinion} = s_i}
+$$
+
+versus
+
+$$
+\boxed{\text{interaction relationship} = J_{ij}}
+$$
+
+---
+
+### Is \(J\) changed when opinions change?
+
+In the experiment/code we examined, **no**.
+
+The interaction matrix \(J\) is generated when the experimental setup is created and then stays fixed during the forward dynamics.
+
+The opinions/spins change:
+
+$$
+s_i(0) \rightarrow s_i(1) \rightarrow s_i(2) \rightarrow \cdots
+$$
+
+but \(J\) remains fixed.
+
+So we can think of the experiment as:
+
+> **Fixed social network \(J\) + evolving opinions \(s(t)\).**
+
+This is useful because it allows the researchers to study how opinions evolve under a controlled interaction structure.
+
+---
+
+### Messages
+
+Agents communicate through messages.
+
+We can denote a message from agent \(i\) to agent \(j\) at time \(t\) as something like:
+
+$$
+m_{ij}(t).
+$$
+
+For example:
+
+$$
+m_{12}(0)
+$$
+
+means:
+
+> the message sent from Agent 1 to Agent 2 during round 0.
+
+The actual message is natural language generated by the LLM.
+
+The message is then placed into the receiving agent's appropriate inbox according to \(J\).
+
+So there is a connection between:
+
+$$
+J_{ij}
+$$
+
+and how the message from \(i\) is treated by \(j\).
+
+---
+
+### Trajectory
+
+A **trajectory** is the evolution of the system through time.
+
+For example, suppose we have three agents.
+
+At time 0:
+
+$$
+\mathbf{s}(0)=(+1,-1,+1)
+$$
+
+After one interaction round:
+
+$$
+\mathbf{s}(1)=(+1,+1,+1)
+$$
+
+After another round:
+
+$$
+\mathbf{s}(2)=(-1,+1,+1)
+$$
+
+The sequence
+
+$$
+\mathbf{s}(0)
+\rightarrow
+\mathbf{s}(1)
+\rightarrow
+\mathbf{s}(2)
+\rightarrow \cdots
+$$
+
+is the **opinion trajectory**.
+
+It tells us how the system's state changes over time.
+
+The messages generated along the way are also part of the recorded dynamics:
+
+$$
+m_{ij}(t).
+$$
+
+So, at a high level:
+
+$$
+\boxed{
+\text{trajectory}
+=
+\text{sequence of system states over time}
+}
+$$
+
+---
+
+### Replica
+
+A **replica** is one realization/run of the experiment.
+
+For example, imagine we run the same question with the same general experimental setup several times:
+
+* Replica 1
+* Replica 2
+* Replica 3
+
+Because the LLM can produce different responses, the resulting messages and opinions can differ between runs.
+
+Each replica therefore gives us one possible trajectory:
+
+$$
+\text{Replica 1}
+\rightarrow
+\mathbf{s}^{(1)}(0),\mathbf{s}^{(1)}(1),...
+$$
+
+$$
+\text{Replica 2}
+\rightarrow
+\mathbf{s}^{(2)}(0),\mathbf{s}^{(2)}(1),...
+$$
+
+This lets researchers study not just **one** outcome, but the behavior of the system across multiple realizations.
+
+---
+
+### Putting everything together
+
+The easiest mental model is:
+
+$$
+\boxed{\text{Persona}}
+$$
+
+is **who the agent is**,
+
+$$
+\boxed{J_{ij}}
+$$
+
+is **how agents are connected/interact**,
+
+$$
+\boxed{s_i(t)}
+$$
+
+is **what agent \(i\) currently believes**,
+
+$$
+\boxed{m_{ij}(t)}
+$$
+
+is **what agent \(i\) says to agent \(j\)**,
+
+and
+
+$$
+\boxed{\text{trajectory}}
+$$
+
+is **how the opinions evolve over time**.
+
+A complete experiment can therefore be viewed as:
+
+$$
+\boxed{
+\text{personas}
++
+J
++
+\text{question}
+\rightarrow
+\text{opinions}
+\rightarrow
+\text{messages}
+\rightarrow
+\text{new opinions}
+\rightarrow
+\cdots
+}
+$$
+
+The key conceptual separation is:
+
+**Persona ≠ opinion ≠ interaction.**
+
+* **Persona:** fixed background of the agent.
+* **Spin/opinion \(s_i(t)\):** can change from round to round.
+* **Interaction \(J_{ij}\):** describes the relationship/network and is fixed in the setup we examined.
+* **Messages:** natural-language communication that carries information between agents.
+* **Trajectory:** the resulting evolution of the system over time.
+* **Replica:** one independent realization of that experiment.
+
+
+## 3. Running the experiment
+
+| Physics / paper concept          | Where in repository                                      | What it does                                             |
+| -------------------------------- | -------------------------------------------------------- | -------------------------------------------------------- |
+| **Agent / persona**              | `lib/datagen/collect_energy.py` + `dynamics.py`          | Loads personas and associates persona `i` with agent `i` |
+| **Question / statement**         | `collect_energy.py`                                      | Loads the question given to every agent                  |
+| **Interaction matrix \(J\)**     | `lib/datagen/graph.py`                                   | Generates the signed social network                      |
+| **Spin / opinion \(s_i(t)\)**    | `lib/datagen/samplers.py` + `dynamics.py`                | LLM produces an opinion; code converts it to ±1          |
+| **Messages**                     | `lib/datagen/samplers.py` + `dynamics.py`                | LLM generates natural-language messages                  |
+| **Interaction effect of \(J\)**  | `dynamics.py::_build_inboxes()`                          | Places messages into "agree" or "disagree" inboxes       |
+| **Forward dynamics**             | `lib/datagen/dynamics.py`                                | Executes message → inbox → opinion updates               |
+| **Trajectory collection**        | `collect_energy.py` → `run_forward_dynamics()`           | Runs the dynamics and saves trajectories                 |
+| **Replica**                      | `dynamics.py::Replica`                                   | One realization of a question + graph + repeated run     |
+| **Trajectory analysis**          | `res/*.ipynb`, especially `1_archetypes`, `2_conviction` | Studies what happened                                    |
+| **Fitted physics model**         | `res/4_prediction.ipynb` + `res/utils.py`                | Learns the effective dynamical rule                      |
+| **Couplings \(\beta\)**          | `res/couplings.json`                                     | Stores fitted interaction parameters                     |
+| **Temperature \(T\)**            | `res/5_temperaturesweep.ipynb`                           | Studies the fitted model at different noise levels       |
+| **Critical temperature \(T_c\)** | `res/5_temperaturesweep.ipynb`                           | Estimates phase-transition-like behavior                 |
+
+
+Instructions for data generation: use the files under lib/. The following command will use the first question (``--limit 1``) from the training and test sets for the subjective dataset (`data/subj/train.jsonl`, `data/subj/test.jsonl`). It uses the first four personas (``--num-agents 4``) from `data/subj/personas.json`, one shared graph, two update rounds, and three opinion samples per
 agent. `--num-edges 6` specifies six nonzero entries in the symmetric interaction matrix, corresponding to three undirected connections. This demo uses simulated responses through the --mock option, requires no API key, and takes approximately one second on the tested machine. To generate responses using gpt-4o-mini, remove --mock and set the OPENAI_API_KEY environment variable. Runtime for API-backed generation depends on response times and rate limits. Run the following command from the repository root.
 
 ```bash
@@ -65,71 +445,8 @@ python -m lib.datagen.collect_energy \
   --output-dir demo_output
 ```
 
-For API-backed generation only
+The script will write files into the "demo_output" directory. To be able to see the results, move the files into "data/models/mock/subjective_energy", and then run the "clean_data.ipynb" notebook.
 
-```bash
-export OPENAI_API_KEY="your-api-key"
-```
+From there, it is possible to run the "0_example.ipynb" notebook to visualize the evolution of the agents'opinion over time and other interesting statistics.
 
-Expected output: The command creates 3 files:
-```text
-demo_output/
-  manifest.json
-  political_stance_0__J0__rep00.json
-  political_stance_156__J0__rep00.json
-```
-The manifest describes two episodes: one training question and one test question. Each episode contains a 4 × 4 interaction matrix `J`, a 3 × 4 array containing the initial opinions and the opinions after each of the two updates in `spins_history`, a 3 × 4 × 3 array of individual opinion samples in `spins_raw_history`, two rounds of messages `messages_history`. 
-
-### Instructions for use
-For reproducing the results in the paper, open a notebook in `res/` and run its cells in order. A useful starting point is `res/1_archetypes.ipynb`, which loads the released synchronous data and produces trajectory-classification summaries. Its initial data-loading cell should report `9600 societies`.
-
-For prediction and downstream analyses:
-- Run `res/4_prediction.ipynb` to fit the prediction models and regenerate `res/couplings.json`. 
-- Run `res/5_temperaturesweep.ipynb` and `res/6_distribution.ipynb` using those fitted couplings.
-
-### Running Custom Experiments
-For running new experiments, prepare separate training and test JSONL files. Each line must contain a unique `qid` and a `question`.
-
-Example `my_train.jsonl`:
-
-```json
-{"qid":"custom_train_0","question":"Public transport should be free."}
-```
-
-Example `my_test.jsonl`:
-
-```json
-{"qid":"custom_test_0","question":"Cities should create more pedestrian-only streets."}
-```
-
-Prepare a persona file, `my_personas.json`, containing a JSON list:
-
-```json
-[
-  "You prioritize environmental protection.",
-  "You prioritize individual freedom.",
-  "You prioritize economic efficiency.",
-  "You prioritize social equality."
-]
-```
-
-Run the offline demo command above with these additional arguments and replace its output directory with `custom_output`.
-```text
---train-file my_train.jsonl
---test-file my_test.jsonl
---personas my_personas.json
---output-dir custom_output
-```
-
-Keep question IDs distinct across both files, since they are used in episode filenames.
-
-For objective experiments, use `--mode objective` and include a `choices` object with `A` and `B` alternatives.
-
-```json
-{"qid":"custom_objective_0","question":"What is 2 + 2?","choices":{"A":"4","B":"5"},"answer":"A"}
-```
-
-### License
-
-The source code is distributed under the
-[Apache License 2.0](LICENSE).
+It is possible to set the model through the ``--model`` option. The script will create a directory with useful files that need to be moved inside the **model** directory, otherwise they won't be visible to the Jupyter Notebook scripts.
