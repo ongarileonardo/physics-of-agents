@@ -154,11 +154,11 @@ def spin_sampler_stateful(
         )
         return _parse_spin_objective(pi(user_prompt))
 
-    stance = "AGREES with" if _stance_sign(current_spin) > 0 else "DISAGREES with"
+    stance = "AGREED" if _stance_sign(current_spin) > 0 else "DISAGREED"
     user_prompt = (
         _subjective_context(persona, question, messages_agree, messages_disagree)
         + f"# Instruction\n"
-        f"Your persona currently {stance} the statement."
+        f"Last time I asked you, you {stance} with the statement."
         f"Given this background, is your persona currently more likely to AGREE or "
         f"DISAGREE with the statement?\n"
         f"## Response Format\n"
@@ -192,7 +192,7 @@ def message_sampler(
             f"to a fellow panelist stating that you favor option {letter} and giving "
             f"the single strongest reason from your reasoning.\n"
             f"## Response Format\n"
-            f"Respond only with a two-sentence message. Do not output anything else."
+            f"Respond only with a one-sentence message. Do not output anything else."
         )
         return pi(user_prompt).strip()
 
@@ -203,7 +203,7 @@ def message_sampler(
         f"Your persona currently {stance} the statement. Write a brief message to a "
         f"peer that conveys this view and your persona's main reason for holding it.\n"
         f"## Response Format\n"
-        f"Respond only with a two-sentence message from your persona. "
+        f"Respond only with a one-sentence message from your persona. "
         f"Do not output anything else."
     )
     return pi(user_prompt).strip()
