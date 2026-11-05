@@ -116,7 +116,7 @@ def make_aihubmix_pi(
 
 def make_gemini_pi(
     model: str,
-    temperature: float = 0.7,
+    temperature: float = 0.2,
 ):
     from google import genai
     api_key = os.getenv("GEMINI_API_KEY")
@@ -178,7 +178,7 @@ def make_mock_pi(seed: int = 0) -> Pi:
 
 def make_openrouter_openai_pi(
     model: str,
-    temperature: float = 0.7,
+    temperature: float = 0.2,
     max_output_tokens: int = 256,
     max_retries: int = 10,
     api_key: str | None = None,
@@ -205,7 +205,7 @@ def make_openrouter_openai_pi(
 
 def make_openrouter_pi(
     model: str,
-    temperature: float = 0.7,
+    temperature: float = 0.2,
     max_output_tokens: int = 256,
     max_retries: int = 5,
     api_key: str | None = None,

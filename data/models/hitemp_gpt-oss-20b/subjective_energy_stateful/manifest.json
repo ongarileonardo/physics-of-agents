@@ -2,7 +2,7 @@
   "meta": {
     "experiment": "subjective_energy",
     "mode": "subjective",
-    "model": "openai/gpt-oss-safeguard-20b",
+    "model": "openai/gpt-oss-20b",
     "backend": "openrouter",
     "temperature": 0.7,
     "num_agents": 32,

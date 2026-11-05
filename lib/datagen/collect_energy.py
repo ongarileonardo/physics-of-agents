@@ -27,11 +27,7 @@ BACKENDS: Dict[str, str] = {
     "google/gemma-3n-E4B-it": "together",
     "qwen3.6-plus-preview-free": "aihubmix",
     "gemini-3.5-flash-lite": "gemini",
-    "gemma-4-26b-a4b-it": "gemini",
-    "nvidia/nemotron-3.5-lightning:free": "openrouter",
-    "openai/gpt-oss-safeguard-20b": "openrouter",
-    "deepseek/deepseek-v4.1-flash-1017": "openrouter",
-    "mistralai/mistral-nemo": "openrouter",
+    "gemma-4-26b-a4b-it": "gemini"
 }
 
 
@@ -44,7 +40,7 @@ def resolve_backend(model: str, backend: str | None) -> str:
     """Resolve the API backend: explicit flag > registry > infer from name."""
     if backend is not None:
         return backend
-    return BACKENDS.get(model) or ("together" if "/" in model else "openai")
+    return BACKENDS.get(model) or ("openrouter" if "/" in model else "openai")
 
 
 def load_canonical_personas(
@@ -189,7 +185,7 @@ def main() -> None:
     ap.add_argument("--backend", choices=("openai", "together",
                                             "aihubmix", "gemini", "openrouter"), default=None,
                     help="API backend; inferred from the model name by default.")
-    ap.add_argument("--temperature", type=float, default=0.7)
+    ap.add_argument("--temperature", type=float, default=0.2)
     ap.add_argument("--mode", choices=("subjective", "objective"),
                     default="subjective",
                     help="subjective -> AGREE/DISAGREE; objective -> answer A/B.")
@@ -351,10 +347,9 @@ def main() -> None:
             max_output_tokens=1024,
             extra_body={
                 "reasoning": {
-                    "effort": "low",
-                    "max_tokens": 256,
+                    "enabled": "False"
                 }
-            },
+            }
         )
     else:
         pi = make_openai_pi(

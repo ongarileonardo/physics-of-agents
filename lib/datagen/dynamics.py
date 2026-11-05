@@ -84,9 +84,9 @@ def _spin_call_with_retry(
             jitter = random.uniform(0,2)
             time.sleep(delay + jitter)
             # spin_sampler for original model,
-
-            return spin_sampler_stateful(persona, statement, agree, disagree, pi,
-                                current_spin=current_spin, mode=mode, choices=choices)
+            # spin_sampler_stateful otherwise (with current_spin) 
+            return spin_sampler(persona, statement, agree, disagree, pi,
+                                mode=mode, choices=choices)
         except ValueError as e:
             logger.warning(
                 "spin_sampler failed on attempt %d/%d: %s",
