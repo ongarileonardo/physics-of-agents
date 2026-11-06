@@ -27,6 +27,7 @@ BACKENDS: Dict[str, str] = {
     "google/gemma-3n-E4B-it": "together",
     "qwen3.6-plus-preview-free": "aihubmix",
     "gemini-3.5-flash-lite": "gemini",
+    "deepseek-v4.1-flash-1017": "openrouter",
     "gemma-4-26b-a4b-it": "gemini"
 }
 
