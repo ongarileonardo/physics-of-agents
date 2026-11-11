@@ -61,7 +61,7 @@ means Agent 1 agrees.
 
 If Agent 1 receives messages and changes its opinion:
 
-$s_1(0)=+1 $ could become $ s_1(1)=-1$
+$s_1(0)=+1$ could become $s_1(1)=-1$
 
 So the **spin changes over time**.
 
