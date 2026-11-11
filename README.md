@@ -80,9 +80,9 @@ The matrix $J$ describes **how agents are connected/interact**. An element $J_{i
 
 In the setup we examined:
 
-* \(J_{ij}=+1\): attractive/agree-type interaction
-* \(J_{ij}=-1\): repulsive/disagree-type interaction
-* \(J_{ij}=0\): no interaction
+* $J_{ij}=+1$: attractive/agree-type interaction
+* $J_{ij}=-1$: repulsive/disagree-type interaction
+* $J_{ij}=0$: no interaction
 
 For example:
 
@@ -103,7 +103,7 @@ means, for example:
 
 ### Very important distinction
 
-**\(J_{ij}\) does NOT tell us whether the two agents currently agree.**
+**$J_{ij}$ does NOT tell us whether the two agents currently agree.**
 
 For example, we could have $J_{12}=+1$ but:
 
@@ -185,12 +185,6 @@ $$
 is the **opinion trajectory**.
 
 It tells us how the system's state changes over time.
-
-The messages generated along the way are also part of the recorded dynamics:
-
-$$
-m_{ij}(t).
-$$
 
 ### Replica
 
