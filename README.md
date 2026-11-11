@@ -29,22 +29,12 @@ The paper then studies the resulting opinion dynamics using a physics-inspired f
 
 ### Agents
 
-Suppose we have three agents:
-
-$$
+Suppose we have three agents $
 A_1,\ A_2,\ A_3
-$$
-
-We can also simply label them:
-
-$$
-i=1,2,3
-$$
-
+$
 Each agent has a fixed **persona**.
 
 For example:
-
 * Agent 1: environmental activist
 * Agent 2: economist
 * Agent 3: business owner
@@ -74,45 +64,19 @@ $$
 
 means Agent 1 agrees.
 
-And:
+If Agent 1 receives messages and changes its opinion:
 
-$$
-s_2(0)=-1
-$$
-
-means Agent 2 disagrees.
-
-If Agent 2 receives messages and changes its opinion:
-
-$$
-s_2(0)=-1
-$$
-
-could become
-
-$$
-s_2(1)=+1.
-$$
+$
+s_1(0)=+1
+$ could become $
+s_1(1)=-1.
+$
 
 So the **spin changes over time**.
 
 ### Interaction matrix \(J\)
 
-The matrix
-
-$$
-J
-$$
-
-describes **how agents are connected/interact**.
-
-An element
-
-$$
-J_{ij}
-$$
-
-describes the relationship from agent \(i\) to agent \(j\).
+The matrix $J$ describes **how agents are connected/interact**. An element $J_{ij}$ describes the relationship from agent \(i\) to agent \(j\).
 
 In the setup we examined:
 
@@ -141,13 +105,7 @@ means, for example:
 
 **\(J_{ij}\) does NOT tell us whether the two agents currently agree.**
 
-For example, we could have:
-
-$$
-J_{12}=+1
-$$
-
-but:
+For example, we could have $J_{12}=+1$ but:
 
 $$
 s_1=+1,\qquad s_2=-1.
@@ -155,13 +113,7 @@ $$
 
 So the agents currently disagree, even though their relationship is attractive.
 
-Similarly:
-
-$$
-J_{12}=-1
-$$
-
-doesn't mean they cannot communicate. It means the interaction is treated as repulsive/disagree-type.
+Similarly, $J_{12}=-1$ doesn't mean they cannot agree. It means the interaction is treated as repulsive/disagree-type.
 
 ### Is \(J\) changed when opinions change?
 
@@ -318,7 +270,7 @@ Contains experimental implementations and alternative approaches developed to re
 
 - **`langgraph/`**: An initial, simplified implementation using LangGraph. This approach was abandoned in favor of other orchestration solutions.
 
-- **`mesa/`**: An experimental implementation using [Mesa](https://mesa.readthedocs.io/), an agent-based modeling framework. It serves as a starting point for exploring alternative orchestration mechanisms and developing new features.
+- **`mesa/`**: An experimental implementation using Mesa, an agent-based modeling framework [2]. It serves as a starting point for exploring alternative orchestration mechanisms and developing new features.
 
 These implementations are experimental and are separate from the main data-generation pipeline.
 
@@ -391,3 +343,5 @@ From there, it is possible to run the notebooks to study the evolution of the ag
 ## Bibliography
 
 [[1]](https://arxiv.org/abs/2608.16578) *El, Batu, et al. "Physics of Agents: Statistical Mechanics Predicts Collective Behavior of AI Agents." arXiv preprint arXiv:2608.16578 (2026).*
+
+[[2]](https://mesa.readthedocs.io/) *ter Hoeven, E., Kwakkel, J., Hess, V., Pike, T., Wang, B., rht, & Kazil, J. (2025). Mesa 3: Agent-based modeling with Python in 2025. Journal of Open Source Software, 10(107), 7668. https://doi.org/10.21105/joss.07668*
