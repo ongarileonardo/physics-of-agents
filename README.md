@@ -55,13 +55,13 @@ The exact meaning depends on the experiment. For an objective question, the two 
 
 For example, at time $t=0$:
 
-$ s_1(0)=+1 $
+$s_1(0)=+1$
 
 means Agent 1 agrees.
 
 If Agent 1 receives messages and changes its opinion:
 
-$ s_1(0)=+1 $ could become $ s_1(1)=-1 $
+$s_1(0)=+1 $ could become $ s_1(1)=-1$
 
 So the **spin changes over time**.
 
