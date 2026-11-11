@@ -270,7 +270,82 @@ This lets researchers study not just **one** outcome, but the behavior of the sy
 
 ---
 
-## 3. Running the experiment
+## 3. Directory structure
+
+The repository is organized into four main components: the core implementation, data storage, experimental implementations, and results analysis.
+
+```text
+.
+├── lib/
+│   ├── datagen/
+│   ├── clean_data.ipynb
+│   └── features.py
+│
+├── data/
+│   └── models/
+│
+├── personal/
+│   ├── langgraph/
+│   └── mesa/
+│
+└── analysis/
+    ├── opinions_evolution.ipynb
+    ├── couplings.json
+    └── utils.py
+```
+
+### a. Core implementation — `lib/`
+
+Contains the main implementation of the Physics of Agents framework.
+
+- **`datagen/`**: Contains the Python code responsible for generating experimental replicas and running the agent dynamics. This includes agent initialization, interaction networks, opinion sampling, message exchange, and the evolution of opinions over multiple rounds.
+
+- **`clean_data.ipynb`**: Notebook used in the data-processing stage. It loads the raw JSON simulation runs, converts them into a structured Pandas DataFrame, enriches each run with labels from the objective and subjective datasets, and exports a cleaned dataset. 
+
+- **`features.py`**: Contains feature-related code used by the implementation.
+
+### b. Experimental data — `data/`
+
+Stores the data generated and used throughout the experiments.
+
+- **`models/`**: Stores the experimental results in JSON format. Each run contains information about the simulated system, including agents, their personas, messages exchanged, opinions (spins), and their evolution over time.
+
+Other directories contain datasets and intermediate data used by the experiments.
+
+### c. Experimental implementations — `personal/`
+
+Contains experimental implementations and alternative approaches developed to reproduce, explore, and extend the main framework.
+
+- **`langgraph/`**: An initial, simplified implementation using LangGraph. This approach was abandoned in favor of other orchestration solutions.
+
+- **`mesa/`**: An experimental implementation using [Mesa](https://mesa.readthedocs.io/), an agent-based modeling framework. It serves as a starting point for exploring alternative orchestration mechanisms and developing new features.
+
+These implementations are experimental and are separate from the main data-generation pipeline.
+
+### d. Results and analysis — `analysis/`
+
+Contains the notebooks and supporting code used to investigate and visualize the experimental results.
+
+- **`opinions_evolution.ipynb`**: Jupyter notebook for analyzing the evolution of agents' opinions over time and exploring the resulting system dynamics.
+
+- **`couplings.json`**: Stores the fitted coupling parameters used in the physics-inspired model.
+
+- **`utils.py`**: Utility functions supporting the analysis notebooks.
+
+### Python environments and dependencies
+
+The project uses different Python environments depending on the implementation.
+
+| Environment | Python version | Requirements |
+|---|---|---|
+| Main implementation | 3.9.13 | `requirements.txt` |
+| Mesa experiments | 3.11+ | `mesa_requirements.txt` |
+
+The Mesa implementation requires a newer Python version and should therefore be installed in a separate environment.
+
+---
+
+## 4. Running the experiment
 
 | Physics / paper concept          | Where in repository                                      | What it does                                             |
 | -------------------------------- | -------------------------------------------------------- | -------------------------------------------------------- |
@@ -283,7 +358,7 @@ This lets researchers study not just **one** outcome, but the behavior of the sy
 | **Forward dynamics**             | `lib/datagen/dynamics.py`                                | Executes message → inbox → opinion updates               |
 | **Trajectory collection**        | `collect_energy.py` → `run_forward_dynamics()`           | Runs the dynamics and saves trajectories                 |
 | **Replica**                      | `dynamics.py::Replica`                                   | One realization of a question + graph + repeated run     |
-| **Trajectory analysis**          | `res/*.ipynb`,  | Studies what happened                                    |
+| **Trajectory analysis**          | `analysis/*.ipynb`,  | Studies what happened                                    |
 
 
 
