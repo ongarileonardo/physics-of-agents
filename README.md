@@ -29,10 +29,7 @@ The paper then studies the resulting opinion dynamics using a physics-inspired f
 
 ### Agents
 
-Suppose we have three agents $
-A_1,\ A_2,\ A_3
-$
-Each agent has a fixed **persona**.
+Suppose we have three agents $ A_1,\ A_2,\ A_3 $. Each agent has a fixed **persona**.
 
 For example:
 * Agent 1: environmental activist
@@ -56,21 +53,15 @@ where:
 
 The exact meaning depends on the experiment. For an objective question, the two values can instead represent **A/B**.
 
-For example, at time \(t=0\):
+For example, at time $t=0$:
 
-$$
-s_1(0)=+1
-$$
+$ s_1(0)=+1 $
 
 means Agent 1 agrees.
 
 If Agent 1 receives messages and changes its opinion:
 
-$
-s_1(0)=+1
-$ could become $
-s_1(1)=-1.
-$
+$ s_1(0)=+1 $ could become $ s_1(1)=-1 $
 
 So the **spin changes over time**.
 
