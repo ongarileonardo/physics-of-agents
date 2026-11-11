@@ -29,7 +29,7 @@ The paper then studies the resulting opinion dynamics using a physics-inspired f
 
 ### Agents
 
-Suppose we have three agents $ A_1,\ A_2,\ A_3 $. Each agent has a fixed **persona**.
+Suppose we have three agents $A_1, A_2, A_3$. Each agent has a fixed **persona**.
 
 For example:
 * Agent 1: environmental activist
