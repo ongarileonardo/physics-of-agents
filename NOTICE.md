@@ -42,7 +42,7 @@ The original idea was to force $$\xi_{i,k} \in \{0,1\}$$ and compute $$J_{ij} = 
 
 _"The Dissemination of Culture: A Model with Local Convergence and Global Polarization" - Axelrod (1997)_
 Axelrod proposes a simple model showing that local interactions can produce local consensus while preserving large-scale cultural diversity.
-The basic model considers a population of agents, each of them with a cultural state represented by a vector of features $$\sigma_i = \sigma_{i,k}$$ $$\sigma_i = \sigma_{i,k}_{k=0}^F$$, where $$\sigma_{i,k} \in C \subset \mathbb{N}$$ 
+The basic model considers a population of agents, each of them with a cultural state represented by a vector of features $$\sigma_i = \sigma_{i,k}_{k=0}$$ $$\sigma_i = \sigma_{i,k}_{k=0}^F$$, where $$\sigma_{i,k} \in C \subset \mathbb{N}$$ 
 Here, two agents interact with probability equal to their cultural similarity and interactions between agents increase their similarity. The surprising result found are patterns of local convergence and global polarization. The degree of cultural similarity between two individuals is defined as the percentage of their features that have the identical trait. For example, if two agents share two of the five attributes, their cultural similarity is 40%.
 
 \
