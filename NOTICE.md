@@ -35,17 +35,17 @@ The results showed that agents behave more intermittently in the non-symmetric c
 ### 4. Hopfield model for personas and interactions
 
 **Theoretical concept:**
-The idea is to use some feature vectors $\boldsymbol{\xi}_i$ for each agent to build the interaction matrix between them.
+The idea is to use some feature vectors $\mathbf{\xi}_i$ for each agent to build the interaction matrix between them.
 The original idea was to force $\xi_{i,k} \in \{0,1\}$ and compute 
 $$
-J_{ij} = \boldsymbol{\xi}_i \cdot \boldsymbol{\xi}_j = \sum_{k=0}^K \xi_{i,k} \ \xi_{j,k}
+J_{ij} = \mathbf{\xi}_i \cdot \mathbf{\xi}_j = \sum_{k=0}^K \xi_{i,k} \ \xi_{j,k}
 $$
 
 **Literature:**
 
 _"The Dissemination of Culture: A Model with Local Convergence and Global Polarization" - Axelrod (1997)_
 Axelrod proposes a simple model showing that local interactions can produce local consensus while preserving large-scale cultural diversity.
-The basic model considers a population of agents, each of them with a cultural state represented by a vector of features $\boldsymbol{\sigma_i} = \{ \sigma_{i,k} \}_{k=0}^F$, where $\sigma_{i,k} \in C \subset \mathbb{N}$ 
+The basic model considers a population of agents, each of them with a cultural state represented by a vector of features $\mathbf{\sigma_i} = \{ \sigma_{i,k} \}_{k=0}^F$, where $\sigma_{i,k} \in C \subset \mathbb{N}$ 
 Here, two agents interact with probability equal to their cultural similarity and interactions between agents increase their similarity. The surprising result found are patterns of local convergence and global polarization. The degree of cultural similarity between two individuals is defined as the percentage of their features that have the identical trait. For example, if two agents share two of the five attributes, their cultural similarity is 40%.
 
 \
@@ -53,7 +53,7 @@ Here, two agents interact with probability equal to their cultural similarity an
 _"An agent based force vector model of social influence that predicts strong polarization in a connected world" - G. Jordan Maclay and Moody Ahmad (2021)_
 In this paper, an agent is represented as a two-dimensional vector, that represents the attribute space. 
 $$
-\boldsymbol{A_i} = (x_i, y_i)
+\mathbf{A_i} = (x_i, y_i)
 $$ 
 Here, $x$ and $y$ are attributes like social and economic condition.
 The authors introduce a force between two agents inspired by gravitational and electric dipole interactions.
