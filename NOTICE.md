@@ -35,7 +35,7 @@ The results showed that agents behave more intermittently in the non-symmetric c
 ### 4. Hopfield model for personas and interactions
 
 **Theoretical concept:**
-The idea is to use some feature vectors $\mathbf{\xi}_i$ for each agent to build the interaction matrix between them.
+The idea is to use some feature vectors $(\mathbf{\xi}_i)$ for each agent to build the interaction matrix between them.
 The original idea was to force $\xi_{i,k} \in \{0,1\}$ and compute 
 $$
 J_{ij} = \mathbf{\xi}_i \cdot \mathbf{\xi}_j = \sum_{k=0}^K \xi_{i,k} \ \xi_{j,k}
@@ -51,11 +51,7 @@ Here, two agents interact with probability equal to their cultural similarity an
 \
 \
 _"An agent based force vector model of social influence that predicts strong polarization in a connected world" - G. Jordan Maclay and Moody Ahmad (2021)_
-In this paper, an agent is represented as a two-dimensional vector, that represents the attribute space. 
-$$
-\mathbf{A_i} = (x_i, y_i)
-$$ 
-Here, $x$ and $y$ are attributes like social and economic condition.
+In this paper, an agent is represented as a two-dimensional vector, that represents the attribute space $$\mathbf{A_i} = (x_i, y_i)$$ Here, $x$ and $y$ are attributes like social and economic condition.
 The authors introduce a force between two agents inspired by gravitational and electric dipole interactions.
 
 \
