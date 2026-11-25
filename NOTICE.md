@@ -35,7 +35,7 @@ The results showed that agents behave more intermittently in the non-symmetric c
 ### 4. Hopfield model for personas and interactions
 
 **Theoretical concept:**
-The idea is to use some feature vectors $\pmb{\xi}_i$ for each agent to build the interaction matrix between them.
+The idea is to use some feature vectors $\vec{\xi}_i$ for each agent to build the interaction matrix between them.
 The original idea was to force $$\xi_{i,k} \in \{0,1\}$$ and compute $$J_{ij} = \mathbf{\xi}_i \cdot \mathbf{\xi}_j = \sum_{k=0}^K \xi_{i,k} \ \xi_{j,k}$$
 
 **Literature:**
