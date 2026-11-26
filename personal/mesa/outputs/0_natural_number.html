@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Opinion dynamics</title>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']]
+      },
+      options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+      font: 16px/1.5 system-ui, sans-serif;
+      color: #202124;
+      background: #f7f8fa;
+    }
+    * { box-sizing: border-box; }
+    body { max-width: 1200px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    h1 { margin: 0 0 2.5rem; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.1; }
+    h2 { margin: 2rem 0 1rem; }
+    h3 { margin-top: 0; }
+    .panel { padding: 1.25rem; border: 1px solid #dfe1e5; border-radius: 12px; background: white; }
+    button { font: inherit; }
+    .legend { display: flex; gap: .6rem 1.2rem; flex-wrap: wrap; margin: .75rem 0 1rem; }
+    .legend span { display: inline-flex; align-items: center; gap: .4rem; }
+    .swatch { display: inline-block; width: 1rem; height: 1rem; border: 1px solid #777; border-radius: 3px; }
+    .edge-swatch { display: inline-block; width: 1.25rem; border-top-width: 3px; border-top-style: solid; }
+    .edge-swatch.concordant { border-top-color: #218739; }
+    .edge-swatch.discordant { border-top-color: #c62828; border-top-style: dotted; }
+    .heatmap-scroll { overflow-x: auto; padding-bottom: .5rem; }
+    .heatmap-layout { display: grid; grid-template-columns: 250px max-content; gap: .75rem; width: max-content; }
+    .network-heading { height: 48px; display: flex; align-items: center; font-weight: 650; font-size: .9rem; }
+    #network { display: block; width: 250px; }
+    .network-edge, .network-node { transition: opacity .12s, stroke-width .12s, r .12s; }
+    .network-edge { cursor: pointer; pointer-events: stroke; }
+    .network-node { cursor: crosshair; }
+    table { border-collapse: collapse; table-layout: fixed; }
+    th, td { height: 48px; padding: .25rem; text-align: center; border: 1px solid #e1e3e6; }
+    thead th { background: #f1f3f4; font-weight: 650; }
+    th.agent-heading, td.agent-label { width: 120px; }
+    th.step-heading, td.spin-cell { width: 76px; }
+    td.agent-label { padding: .2rem .5rem; text-align: left; background: white; }
+    .agent-label button { border: 0; padding: .35rem .45rem; color: #174ea6; background: transparent; text-decoration: underline; cursor: pointer; }
+    .spin-cell { font-weight: 650; }
+    .neutral { color: #555; background: #eee; }
+    .persona-panel { margin-top: 1rem; }
+    .persona-panel header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .persona-panel h3 { margin: 0; }
+    .persona-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+    .persona-text mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; }
+    .timeline-controls { display: flex; align-items: center; gap: 1rem; }
+    #step-slider { flex: 1; min-width: 120px; }
+    #message-list { display: grid; gap: .75rem; margin-top: 1rem; }
+    .message-card { padding: .9rem 1rem; border-left: 4px solid #8ab4f8; border-radius: 4px; background: #f8fafd; }
+    .message-card h3 { margin: 0 0 .4rem; font-size: 1rem; }
+    .message-card p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .muted { color: #5f6368; }
+    @media (max-width: 600px) {
+      body { padding: 1.25rem .75rem 3rem; }
+      .panel { padding: .85rem; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header><h1 id="question"></h1></header>
+    <header><h3 id="choices"></h3></header>
+    <section aria-labelledby="dynamics-heading">
+      <h2 id="dynamics-heading">Opinion Dynamics</h2>
+      <div class="panel">
+        <div id="legend" class="legend" aria-label="Heatmap legend"></div>
+        <div class="heatmap-scroll">
+          <div class="heatmap-layout">
+            <div>
+              <div id="network-heading" class="network-heading">Connections · hover to trace</div>
+              <svg id="network" role="img" aria-label="Agent connection graph"></svg>
+            </div>
+            <table aria-label="Agent opinions by step">
+              <thead id="heatmap-head"></thead>
+              <tbody id="heatmap-body"></tbody>
+            </table>
+          </div>
+        </div>
+        <aside id="persona-panel" class="persona-panel panel" hidden>
+          <header>
+            <h3 id="persona-title"></h3>
+            <button id="persona-close" type="button">Close</button>
+          </header>
+          <p id="persona-text" class="persona-text"></p>
+        </aside>
+      </div>
+    </section>
+    <section aria-labelledby="timeline-heading">
+      <h2 id="timeline-heading">Message Timeline</h2>
+      <div class="panel">
+        <div class="timeline-controls">
+          <button id="previous-step" type="button" aria-label="Previous step">&larr;</button>
+          <label id="timeline-label" for="step-slider">Step 1</label>
+          <input id="step-slider" type="range" min="1" max="1" value="1">
+          <button id="next-step" type="button" aria-label="Next step">&rarr;</button>
+        </div>
+        <div id="message-list" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+  <script>
+    const data = {"question": "0 is a natural number.", "choices": {"A": "True", "B": "False"}, "mode": "objective", "agents": [{"index": 0, "persona": "You are a mathematics expert acting as one agent in a panel. To calibrate the domain and rigor of your expertise, here is one representative problem you have already solved correctly, together with its ground-truth solution. Bring this same level of care and domain knowledge when you reason about new problems.\n\nExample problem (Algebra, Level 5):\nLet \\[f(x) = \\left\\{\n\\begin{array}{cl} ax+3, \u0026\\text{ if }x\u003e2, \\\\\nx-5 \u0026\\text{ if } -2 \\le x \\le 2, \\\\\n2x-b \u0026\\text{ if } x \u003c-2.\n\\end{array}\n\\right.\\]Find $a+b$ if the piecewise function is continuous (which means that its graph can be drawn without lifting your pencil from the paper).\n\nGround-truth solution:\nFor the piecewise function to be continuous, the cases must \"meet\" at $2$ and $-2$. For example, $ax+3$ and $x-5$ must be equal when $x=2$. This implies $a(2)+3=2-5$, which we solve to get $2a=-6 \\Rightarrow a=-3$. Similarly, $x-5$ and $2x-b$ must be equal when $x=-2$. Substituting, we get $-2-5=2(-2)-b$, which implies $b=3$. So $a+b=-3+3=\\boxed{0}$.", "spins": [1, 1, 1, 1, 1], "messages": ["I favor option A because in modern mathematics, particularly set theory and computer science, the standard definition of natural numbers (denoted by $\\mathbb{N}$) includes 0 as the cardinality of the empty set.", "I favor option A because the standard definition in modern mathematics, particularly in set theory and logic, defines the natural numbers as the set $\\mathbb{N} = \\{0, 1, 2, \\dots\\}$, making 0 a natural number.", "I favor option A because modern mathematical standards (ISO 80000-2, set theory, computer science) define the natural numbers as the non-negative integers {0, 1, 2, ...}, making 0 a natural number.", "I favor option A because the standard definition in modern mathematics, particularly in set theory and logic, defines the natural numbers as the set $\\mathbb{N} = \\{0, 1, 2, \\dots\\}$, making 0 a natural number."]}, {"index": 1, "persona": "You are a mathematics expert acting as one agent in a panel. To calibrate the domain and rigor of your expertise, here is one representative problem you have already solved correctly, together with its ground-truth solution. Bring this same level of care and domain knowledge when you reason about new problems.\n\nExample problem (Counting \u0026 Probability, Level 1):\nWhat is the value of $9^3 + 3(9^2) + 3(9) + 1$?\n\nGround-truth solution:\nThe given expression is the expansion of $(9+1)^3$.  In general, the cube of $(x+y)^3$ is \\[(x+y)^3=1x^3+3x^2y+3xy^2+1y^3.\\]   The first and last terms in the given expression are cubes and the middle two terms both have coefficient 3, giving us a clue that this is a cube of a binomial and can be written in the form \\[(x+y)^3\\]In this case, $x=9$ and $y=1$, so our answer is\\[(9+1)^3\\ = 10^3 = \\boxed{1000}\\]", "spins": [1, 1, 1, 1, 1], "messages": ["I favor option A because modern mathematical standards (ISO 80000-2, set theory, computer science) define the natural numbers as the non-negative integers {0, 1, 2, ...}, making 0 a natural number.", "I favor option A because the standard definition in modern mathematics, particularly in set theory and logic, defines the natural numbers as the set $\\mathbb{N} = \\{0, 1, 2, \\dots\\}$, making 0 a natural number.", "I favor option A because the standard definition in modern set theory, logic, and computer science (e.g., ISO 80000-2) defines the natural numbers as the non-negative integers $\\mathbb{N} = \\{0, 1, 2, \\dots\\}$, which includes 0.", "I favor option A because the standard definition in modern mathematics, particularly in set theory and logic, defines the natural numbers as the set $\\mathbb{N} = \\{0, 1, 2, \\dots\\}$, making 0 a natural number."]}, {"index": 2, "persona": "You are a mathematics expert acting as one agent in a panel. To calibrate the domain and rigor of your expertise, here is one representative problem you have already solved correctly, together with its ground-truth solution. Bring this same level of care and domain knowledge when you reason about new problems.\n\nExample problem (Geometry, Level 5):\nSquare ABCD has its center at $(8,-8)$ and has an area of 4 square units. The top side of the square is horizontal. The square is then dilated with the dilation center at (0,0) and a scale factor of 2. What are the coordinates of the vertex of the image of square ABCD that is farthest from the origin? Give your answer as an ordered pair.\n\nGround-truth solution:\nWith the center of dilation at the origin and a scale factor of 2, all the coordinates of square $ABCD$ are twice the coordinates of its preimage. The preimage has an area of 4 square units, so its side length is 2 units. Since the center of the preimage is at $(8, -8)$, the four vertices of the preimage are at $(7, -9), (7, -7), (9, -7)$ and $(9, -9)$. The point $(9, -9)$ is the farthest from the origin on the preimage, so the point farthest from the origin on the image of square $ABCD$ is $\\boxed{(18, -18)}.$", "spins": [-1, -1, -1, -1, -1], "messages": ["I favor option B because in standard mathematical contexts, particularly in analysis and set theory, the natural numbers are defined as the positive integers $\\{1, 2, 3, \\dots\\}$, excluding zero.", "I favor option B because the standard definition in number theory and analysis defines the natural numbers as the positive integers $\\mathbb{N} = \\{1, 2, 3, \\dots\\}$, excluding zero.", "I favor option B because in classical number theory and analysis, the natural numbers are fundamentally defined as the positive integers $\\mathbb{N} = \\{1, 2, 3, \\dots\\}$ used for counting, excluding zero.", "I favor option B because the standard definition in number theory and analysis defines the natural numbers as the positive integers $\\mathbb{N} = \\{1, 2, 3, \\dots\\}$, excluding zero."]}, {"index": 3, "persona": "You are a mathematics expert acting as one agent in a panel. To calibrate the domain and rigor of your expertise, here is one representative problem you have already solved correctly, together with its ground-truth solution. Bring this same level of care and domain knowledge when you reason about new problems.\n\nExample problem (Intermediate Algebra, Level 5):\nShown below are rows 1, 2, and 3 of Pascal's triangle.\n\n\\[\n\\begin{array}{ccccccc}\n\u0026 \u0026 1 \u0026 \u0026 1 \u0026 \u0026 \\\\\n\u0026 1 \u0026 \u0026 2 \u0026 \u0026 1 \u0026 \\\\\n1 \u0026 \u0026 3 \u0026 \u0026 3 \u0026 \u0026 1\n\\end{array}\n\\]Let $(a_i),$ $(b_i),$ $(c_i)$ be the sequence, from left to right, of elements in the 2005th, 2006th, and 2007th rows, respectively, with the leftmost element occurring at $i = 0.$  Compute\n\\[\\sum_{i = 0}^{2006} \\frac{b_i}{c_i} - \\sum_{i = 0}^{2005} \\frac{a_i}{b_i}.\\]\n\nGround-truth solution:\nMore generally, suppose $(a_i),$ $(b_i),$ $(c_i)$ represent the entries in rows $n - 1,$ $n,$ $n + 1$ of Pascal's triangle.  Then\n\\[a_i = \\binom{n - 1}{i}, \\ b_i = \\binom{n}{i}, \\ c_i = \\binom{n + 1}{i},\\]so\n\\begin{align*}\n\\frac{a_i}{b_i} \u0026= \\frac{\\binom{n - 1}{i}}{\\binom{n}{i}} \\\\\n\u0026= \\frac{\\frac{(n - 1)!}{i! (n - i - 1)!}}{\\frac{n!}{i! (n - i)!}} \\\\\n\u0026= \\frac{(n - 1)! (n - i)!}{n! (n - i - 1)!} \\\\\n\u0026= \\frac{n - i}{n} \\\\\n\u0026= 1 - \\frac{i}{n}.\n\\end{align*}Hence,\n\\begin{align*}\n\\sum_{i = 0}^{n - 1} \\frac{a_i}{b_i} \u0026= \\sum_{i = 0}^{n - 1} \\left( 1 - \\frac{i}{n} \\right) \\\\\n\u0026= n - \\frac{(n - 1)n/2}{n} \\\\\n\u0026= n - \\frac{n - 1}{2} = \\frac{n + 1}{2}.\n\\end{align*}Likewise,\n\\[\\frac{b_i}{c_i} = 1 - \\frac{i}{n + 1},\\]and\n\\[\\sum_{i = 0}^n \\frac{b_i}{c_i} = \\frac{n + 2}{2}.\\]Hence,\n\\[\\sum_{i = 0}^n \\frac{b_i}{c_i} - \\sum_{i = 0}^{n - 1} \\frac{a_i}{b_i} = \\frac{n + 2}{2} - \\frac{n + 1}{2} = \\boxed{\\frac{1}{2}}.\\]", "spins": [1, 1, 1, 1, 1], "messages": ["I favor option A because in modern mathematics, particularly set theory and computer science, defining 0 as a natural number (i.e., $\\mathbb{N} = \\{0, 1, 2, \\dots\\}$) provides the most elegant algebraic structure by making $\\mathbb{N}$ a monoid under addition and allowing natural numbers to correspond exactly to the cardinalities of finite sets.", "I favor option A because in modern mathematics, particularly set theory and computer science, the standard definition of natural numbers includes 0 as the cardinality of the empty set.", "I favor option A because in modern mathematics, particularly set theory and computer science, defining 0 as a natural number (i.e., $\\mathbb{N} = \\{0, 1, 2, \\dots\\}$) provides the most elegant algebraic structure by making $\\mathbb{N}$ a monoid under addition and allowing the cardinality of the empty set to be a natural number.", "I favor option A because in modern mathematical foundations (e.g., ZFC set theory, Peano axioms, type theory), the natural numbers are standardly defined to include 0 as the initial element, which provides algebraic and structural advantages such as making ℕ a monoid under addition."]}, {"index": 4, "persona": "You are a mathematics expert acting as one agent in a panel. To calibrate the domain and rigor of your expertise, here is one representative problem you have already solved correctly, together with its ground-truth solution. Bring this same level of care and domain knowledge when you reason about new problems.\n\nExample problem (Number Theory, Level 4):\nIf $AAA_4$ can be expressed as $33_b$, where $A$ is a digit in base 4 and $b$ is a base greater than 5, what is the smallest possible sum $A+b$?\n\nGround-truth solution:\nWe can rewrite $AAA_4$ and $33_b$ to get \\begin{align*}\n16A+4A+A\u0026=3b+3\\quad\\Rightarrow\\\\\n21A\u0026=3b+3.\n\\end{align*}The smallest possible value for $A$ is 1, which gives us $21=3b+3$ and $b=6$. So the smallest sum $A+b=\\boxed{7}$. While there are other values for $A$ and $b$ that work, increasing $A$ will increase $b$, resulting in a larger sum.", "spins": [-1, 1, 1, 1, 1], "messages": ["I favor option B because the standard definition in number theory and analysis defines the natural numbers as the positive integers $\\mathbb{N} = \\{1, 2, 3, \\dots\\}$, excluding zero.", "I favor option A because modern mathematical standards (ISO 80000-2, set theory, computer science) define the natural numbers as the non-negative integers {0, 1, 2, ...}, making 0 a natural number.", "I favor option A because the standard definition in modern mathematics, particularly in set theory and logic, defines the natural numbers as the set $\\mathbb{N} = \\{0, 1, 2, \\dots\\}$, making 0 a natural number.", "I favor option A because the standard definition in modern set theory, logic, and computer science (e.g., ISO 80000-2) defines the natural numbers as the non-negative integers $\\mathbb{N} = \\{0, 1, 2, \\dots\\}$, which includes 0."]}, {"index": 5, "persona": "You are a mathematics expert acting as one agent in a panel. To calibrate the domain and rigor of your expertise, here is one representative problem you have already solved correctly, together with its ground-truth solution. Bring this same level of care and domain knowledge when you reason about new problems.\n\nExample problem (Prealgebra, Level 4):\nMegan has lost Fatima's phone number. Megan knows that the first three digits are either 296 or 299. The remaining four digits are 0, 1, 6 and 7, but she isn't sure of the order of these digits. If Megan randomly dials a seven-digit number that meets these conditions, what is the probability that she dials Fatima's correct number? Express your answer as a common fraction.\n\nGround-truth solution:\nThere are 2 different ways in which Megan can type the first three numbers. There are $4! = 24$ different orderings of the digits 0, 1, 6 and 7 for the last four digits. So, there are $2 \\cdot 24 = 48$ different numbers she can dial. Since exactly one number will be Fatima's, there is a $\\boxed{\\frac{1}{48}}$ probability of Megan guessing it right.", "spins": [1, 1, 1, 1, 1], "messages": ["I favor option A because in modern mathematical foundations like ZFC set theory and the ISO 80000-2 standard, the natural numbers are defined to include 0 as the initial ordinal and the cardinality of the empty set.", "I favor option A because in modern mathematics, particularly in set theory, logic, and computer science, the standard definition defines the natural numbers as the non-negative integers $\\mathbb{N} = \\{0, 1, 2, \\dots\\}$, which includes zero as the cardinality of the empty set.", "I favor option A because in modern mathematics, particularly set theory, logic, and computer science, the standard definition defines the natural numbers as the non-negative integers $\\mathbb{N} = \\{0, 1, 2, 3, \\dots\\}$, which includes zero.", "I favor option A because in modern mathematics, particularly in set theory, logic, and computer science, the standard definition defines the natural numbers as the non-negative integers $\\mathbb{N} = \\{0, 1, 2, 3, \\dots\\}$, which includes zero."]}, {"index": 6, "persona": "You are a mathematics expert acting as one agent in a panel. To calibrate the domain and rigor of your expertise, here is one representative problem you have already solved correctly, together with its ground-truth solution. Bring this same level of care and domain knowledge when you reason about new problems.\n\nExample problem (Precalculus, Level 5):\nThe matrix for reflecting over a certain line $\\ell,$ which passes through the origin, is given by\n\\[\\begin{pmatrix} \\frac{7}{25} \u0026 -\\frac{24}{25} \\\\ -\\frac{24}{25} \u0026 -\\frac{7}{25} \\end{pmatrix}.\\]Find the direction vector of line $\\ell.$  Enter your answer in the form $\\begin{pmatrix} a \\\\ b \\end{pmatrix},$ where $a,$ and $b$ are integers, $a \u003e 0,$ and $\\gcd(|a|,|b|) = 1.$\n\nGround-truth solution:\nSince $\\begin{pmatrix} a \\\\ b \\end{pmatrix}$ actually lies on $\\ell,$ the reflection takes this vector to itself.\n\n[asy]\nunitsize(1.5 cm);\n\npair D = (4,-3), V = (2,1), P = (V + reflect((0,0),D)*(V))/2;\n\ndraw((4,-3)/2--(-4,3)/2,dashed);\ndraw((-2,0)--(2,0));\ndraw((0,-2)--(0,2));\ndraw((0,0)--P,Arrow(6));\n\nlabel(\"$\\ell$\", (4,-3)/2, SE);\n[/asy]\n\nThen\n\\[\\begin{pmatrix} \\frac{7}{25} \u0026 -\\frac{24}{25} \\\\ -\\frac{24}{25} \u0026 -\\frac{7}{25} \\end{pmatrix} \\begin{pmatrix} a \\\\ b \\end{pmatrix} = \\begin{pmatrix} a \\\\ b \\end{pmatrix}.\\]This gives us\n\\[\\begin{pmatrix} \\frac{7}{25} a - \\frac{24}{25} b \\\\ -\\frac{24}{25} a - \\frac{7}{25} b \\end{pmatrix} = \\begin{pmatrix} a \\\\ b \\end{pmatrix}.\\]Then $\\frac{7}{25} a - \\frac{24}{25} b = a$ and $-\\frac{24}{25} a - \\frac{7}{25} b = b.$  Either equation reduces to $b = -\\frac{3}{4} a,$ so the vector we seek is $\\boxed{\\begin{pmatrix} 4 \\\\ -3 \\end{pmatrix}}.$", "spins": [-1, -1, -1, -1, -1], "messages": ["I favor option B because the standard definition in modern mathematics, particularly in set theory and logic, defines the natural numbers as the set $\\mathbb{N} = \\{0, 1, 2, \\dots\\}$, making 0 a natural number.", "I favor option B because in classical number theory and analysis, the natural numbers are defined as the positive integers {1, 2, 3, ...} used for counting, which excludes 0.", "I favor option B because in classical number theory and analysis, the natural numbers are defined as the positive integers $\\mathbb{N} = \\{1, 2, 3, \\dots\\}$, which excludes 0.", "I favor option B because in classical analysis and number theory, the natural numbers are defined as the positive integers $\\mathbb{N} = \\{1, 2, 3, \\dots\\}$, which excludes 0."]}, {"index": 7, "persona": "You are a mathematics expert acting as one agent in a panel. To calibrate the domain and rigor of your expertise, here is one representative problem you have already solved correctly, together with its ground-truth solution. Bring this same level of care and domain knowledge when you reason about new problems.\n\nExample problem (Algebra, Level 5):\nA rectangular band formation is a formation with $m$ band members in each of $r$ rows, where $m$ and $r$ are integers. A particular band has less than 100 band members. The director arranges them in a rectangular formation and finds that he has two members left over. If he increases the number of members in each row by 1 and reduces the number of rows by 2, there are exactly enough places in the new formation for each band member. What is the largest number of members the band could have?\n\nGround-truth solution:\nLet $x$ be the number of band members in each row for the original formation, when two are left over.  Then we can write two equations from the given information: $$rx+2=m$$ $$(r-2)(x+1)=m$$ Setting these equal, we find: $$rx+2=(r-2)(x+1)=rx-2x+r-2$$ $$2=-2x+r-2$$ $$4=r-2x$$ We know that the band has less than 100 members.  Based on the first equation, we must have $rx$ less than 98.  We can guess and check some values of $r$ and $x$ in the last equation.  If $r=18$, then $x=7$, and $rx=126$ which is too big.  If $r=16$, then $x=6$, and $rx=96$, which is less than 98.  Checking back in the second formation, we see that $(16-2)(6+1)=14\\cdot 7=98$ as it should.  This is the best we can do, so the largest number of members the band could have is $\\boxed{98}$.", "spins": [1, 1, 1, 1, 1], "messages": ["I favor option A because modern mathematical standards (ISO 80000-2, set theory, computer science) define $\\mathbb{N}$ to include $0$ as the cardinality of the empty set.", "I favor option A because in modern mathematics, particularly set theory and computer science, the standard definition of natural numbers includes 0 as the cardinality of the empty set.", "I favor option A because in modern mathematics, particularly set theory and computer science, the standard definition of natural numbers includes 0 as the cardinality of the empty set.", "I favor option A because in modern set theory and computer science, 0 is standardly defined as the cardinality of the empty set and the first natural number."]}], "J": [[0, 0, -1, 0, 1, 0, 1, 0, -1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, -1, 0, 0, 0, 0, 1, 0, 0, 1], [0, 0, 0, 0, 1, 0, -1, 0, 1, 0, 0, 1, 0, -1, 1, 0, 0, 0, 1, -1, -1, 0, 0, 0, 0, 1, 0, -1, 0, 1, -1, 0], [-1, 0, 0, 0, -1, -1, 0, 0, -1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, -1, 1, 0, 0, 0, 0, -1, -1, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, -1, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0], [1, 1, -1, 0, 0, 0, 0, 0, 0, -1, 0, 1, 0, -1, 0, 0, -1, 1, 1, 0, -1, 0, 0, 0, 0, 1, 0, -1, 0, 1, -1, 0], [0, 0, -1, 0, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 1, 0, -1, 1, 1, 0, 0, 0, 0, -1], [1, -1, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 1, 0, 0, 0, 0, -1, 0, 1, 0, -1, 0, 0, -1, -1, 1, 0, -1, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1], [-1, 1, -1, 0, 0, 1, -1, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 1, 0, -1, 0, 1, 0, 0, 1, -1, 0], [0, 0, 1, 0, -1, 0, 0, 0, 0, 0, 0, -1, 1, 0, 0, 0, 1, -1, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0], [1, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0, -1, 0, 1, -1, 0, 0, 0, 0, 0, 1], [0, 1, 0, 0, 1, 0, -1, 0, 0, -1, 0, 0, 0, -1, 1, -1, 0, 1, 1, 0, -1, 1, 0, 1, 0, 1, 0, -1, 0, 1, 0, 0], [0, 0, 1, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, -1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0], [0, -1, 1, 0, -1, 0, 1, 0, 0, 0, 0, -1, -1, 0, 0, 0, 0, -1, -1, 0, 1, -1, 0, 0, 0, -1, 0, 1, 0, -1, 0, 0], [0, 1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, -1, 1], [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, -1, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, -1, 1, 0, 0, 0, 0, -1], [0, 0, 1, 0, -1, -1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0], [1, 0, 0, 1, 1, 0, 0, 0, 0, -1, 1, 1, 0, -1, 0, 0, -1, 0, 1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0, -1, 0], [0, 1, 0, 0, 1, 0, -1, 0, 0, -1, 0, 1, 0, -1, 0, 0, 0, 1, 0, 0, -1, 1, 0, 0, -1, 1, 0, -1, 0, 1, 0, 0], [0, -1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0], [0, -1, 1, 0, -1, 0, 1, 0, -1, 0, 0, -1, 0, 1, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0, 0, -1, 0, 1, 0, -1, 1, 0], [0, 0, 0, -1, 0, 1, 0, -1, 0, 0, 0, 1, 1, -1, 1, -1, -1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 1], [-1, 0, -1, 0, 0, 1, -1, 0, 1, 0, -1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, -1], [-1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, 0, 1, -1], [0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, -1, 0, 1], [0, 1, 0, 0, 1, 1, -1, 0, 0, 0, -1, 1, 0, -1, 0, -1, -1, 0, 1, 0, -1, 1, 0, 0, -1, 0, 0, 0, 0, 1, -1, 0], [0, 0, 0, -1, 0, 1, -1, 1, 1, 0, 0, 0, 0, 0, 0, 1, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, -1, 0, 0, -1, 0, 1, 0, 0, 0, 0, -1, -1, 1, 0, 0, 0, 0, -1, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0], [1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, -1, 0, 1, 0, -1, 0, 1, -1, 0, 1, 0, -1, 0, 0, 0, 0, 1, -1, -1, 0, 1, 0, -1, 1, 0, 0, 0, 0, -1, 0], [0, -1, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, 1, -1, 0, 1, 0, -1, 0, 0, 0, -1, 0, -1], [1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0, 0, 0, 0, 1, -1, -1, 1, 0, 0, 0, 0, 0, -1, 0]]};
+    const agents = Array.isArray(data.agents) ? data.agents : [];
+    const matrix = Array.isArray(data.J) ? data.J : [];
+    const mode = data.mode;
+    const spinSteps = agents.reduce(
+      (max, agent) => Math.max(
+        max,
+        Array.isArray(agent.spins) ? agent.spins.length : 0
+      ),
+      0
+    );
+    const messageSteps = agents.reduce(
+      (max, agent) => Math.max(
+        max,
+        Array.isArray(agent.messages) ? agent.messages.length : 0
+      ),
+      0
+    );
+    const hasInitialSpin = spinSteps === messageSteps + 1;
+    const head = document.getElementById("heatmap-head");
+    const body = document.getElementById("heatmap-body");
+    const network = document.getElementById("network");
+    const rowHeight = 48;
+    const graphWidth = 250;
+    const svgNS = "http://www.w3.org/2000/svg";
+    let highlightConnections = () => {};
+    let resetConnections = () => {};
+
+    document.getElementById("question").textContent = data.question || "Opinion dynamics";
+    const choices = Object.entries(data.choices || {});
+    const choicesHeading = document.getElementById("choices");
+    choicesHeading.hidden = choices.length === 0;
+    if (choices.length) {
+      choicesHeading.textContent =
+        "Choices: " + choices.map(([key, value]) => `${key}: ${value}`).join(" | ");
+    }
+
+    
+    function addLegend() {
+      const entries = mode === "objective"
+        ? [["#cfe5ff", "Option A"], ["#fff0a6", "Option B"]]
+        : [["#ccebd3", "Agree"], ["#f5cccc", "Disagree"]];
+      const legend = document.getElementById("legend");
+      legend.replaceChildren();
+      for (const [color, label] of entries) {
+        const item = document.createElement("span");
+        const swatch = document.createElement("i");
+        swatch.className = "swatch";
+        swatch.style.backgroundColor = color;
+        item.append(swatch, document.createTextNode(label));
+        legend.append(item);
+      }
+      const noOpinion = document.createElement("span");
+      const neutralSwatch = document.createElement("i");
+      neutralSwatch.className = "swatch";
+      neutralSwatch.style.backgroundColor = "#eee";
+      noOpinion.append(neutralSwatch, document.createTextNode("No Opinion"));
+      legend.append(noOpinion);
+
+      for (const [color, label] of [
+        ["concordant", "Concordant link"],
+        ["discordant", "Discordant link"]
+      ]) {
+        const item = document.createElement("span");
+        const swatch = document.createElement("i");
+        swatch.className = `edge-swatch ${color}`;
+        item.append(swatch, document.createTextNode(label));
+        legend.append(item);
+      }
+    }
+
+    function makeSvgElement(name, attributes) {
+      const element = document.createElementNS(svgNS, name);
+      for (const [key, value] of Object.entries(attributes)) {
+        element.setAttribute(key, value);
+      }
+      return element;
+    }
+
+    function renderNetwork() {
+      const height = agents.length * rowHeight;
+      network.replaceChildren();
+      network.setAttribute("viewBox", `0 0 ${graphWidth} ${height || rowHeight}`);
+      network.setAttribute("height", String(height || rowHeight));
+      const heading = document.getElementById("network-heading");
+
+      function resetHighlight() {
+        heading.textContent = "Connections · hover to trace";
+        heading.title = "Hover an edge or agent label to trace its links.";
+        for (const edge of network.querySelectorAll(".network-edge")) {
+          edge.style.opacity = "0.75";
+          edge.style.strokeWidth = "2";
+        }
+        for (const node of network.querySelectorAll(".network-node")) {
+          node.setAttribute("fill", "white");
+          node.setAttribute("r", "7");
+        }
+      }
+
+      function highlightAgent(position) {
+        const agent = agents[position];
+        const linked = [];
+        for (let other = 0; other < agents.length; other++) {
+          if (other !== position && Number(matrix[position]?.[other] || 0) !== 0) {
+            linked.push(agents[other].index);
+          }
+        }
+        heading.textContent = linked.length
+          ? `agent ${agent.index}: ${linked.length} links highlighted`
+          : `agent ${agent.index} has no links`;
+        heading.title = linked.length
+          ? `agent ${agent.index} linked to ${linked.map((index) => `agent ${index}`).join(", ")}`
+          : heading.textContent;
+        for (const edge of network.querySelectorAll(".network-edge")) {
+          const incident =
+            edge.dataset.source === String(agent.index) ||
+            edge.dataset.target === String(agent.index);
+          edge.style.opacity = incident ? "1" : "0.08";
+          edge.style.strokeWidth = incident ? "3.5" : "1.5";
+        }
+        for (const node of network.querySelectorAll(".network-node")) {
+          const selected = node.dataset.agent === String(agent.index);
+          node.setAttribute("fill", selected ? "#fbbc04" : "white");
+          node.setAttribute("r", selected ? "9" : "7");
+        }
+      }
+
+      function highlightEdge(edge, source, target) {
+        heading.textContent = `agent ${source} linked to agent ${target}`;
+        heading.title = heading.textContent;
+        for (const candidate of network.querySelectorAll(".network-edge")) {
+          const active = candidate === edge;
+          candidate.style.opacity = active ? "1" : "0.08";
+          candidate.style.strokeWidth = active ? "4" : "1.5";
+        }
+      }
+      highlightConnections = highlightAgent;
+      resetConnections = resetHighlight;
+
+      for (let i = 0; i < agents.length; i++) {
+        for (let j = i + 1; j < agents.length; j++) {
+          const value = Number(matrix[i]?.[j] || 0);
+          if (value === 0) continue;
+          const x1 = i % 2 === 0 ? 36 : graphWidth - 36;
+          const x2 = j % 2 === 0 ? 36 : graphWidth - 36;
+          const y1 = (i + 0.5) * rowHeight;
+          const y2 = (j + 0.5) * rowHeight;
+          const lane = 24 + ((i * agents.length + j) / (agents.length ** 2)) * (graphWidth - 48);
+          const edge = makeSvgElement("path", {
+            d: `M ${x1} ${y1} Q ${lane} ${(y1 + y2) / 2} ${x2} ${y2}`,
+            class: "network-edge",
+            "data-source": agents[i].index,
+            "data-target": agents[j].index,
+            fill: "none",
+            stroke: value > 0 ? "#218739" : "#c62828",
+            "stroke-width": "2",
+            "stroke-opacity": "0.75",
+            "stroke-dasharray": value < 0 ? "1 5" : "none",
+            "stroke-linecap": "round",
+            "stroke-linejoin": "round"
+          });
+          const title = makeSvgElement("title", {});
+          title.textContent = `agent ${agents[i].index} ↔ agent ${agents[j].index}: J = ${value}`;
+          edge.append(title);
+          edge.addEventListener("pointerenter", () => {
+            highlightEdge(edge, agents[i].index, agents[j].index);
+          });
+          edge.addEventListener("pointerleave", resetHighlight);
+          network.append(edge);
+        }
+      }
+      for (let i = 0; i < agents.length; i++) {
+        const circle = makeSvgElement("circle", {
+          class: "network-node",
+          "data-agent": agents[i].index,
+          cx: i % 2 === 0 ? 36 : graphWidth - 36,
+          cy: (i + 0.5) * rowHeight,
+          r: "7",
+          fill: "white",
+          stroke: "#3c4043",
+          "stroke-width": "2"
+        });
+        const title = makeSvgElement("title", {});
+        title.textContent = `agent ${agents[i].index}`;
+        circle.append(title);
+        circle.addEventListener("pointerenter", () => highlightAgent(i));
+        circle.addEventListener("pointerleave", resetHighlight);
+        network.append(circle);
+      }
+      resetHighlight();
+    }
+
+    function renderHeatmap() {
+      addLegend();
+      head.replaceChildren();
+      body.replaceChildren();
+
+      const headerRow = document.createElement("tr");
+      const agentHeading = document.createElement("th");
+      agentHeading.className = "agent-heading";
+      agentHeading.scope = "col";
+      agentHeading.textContent = "Agent";
+      headerRow.append(agentHeading);
+      for (let step = 0; step < spinSteps; step++) {
+        const th = document.createElement("th");
+        th.className = "step-heading";
+        th.scope = "col";
+        th.textContent = hasInitialSpin && step === 0
+          ? "Initial"
+          : `Step ${hasInitialSpin ? step : step + 1}`;
+        headerRow.append(th);
+      }
+      head.append(headerRow);
+
+      for (const agent of agents) {
+        const row = document.createElement("tr");
+        const label = document.createElement("td");
+        label.className = "agent-label";
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = `agent ${agent.index}`;
+        button.addEventListener("click", () => showPersona(agent));
+        button.addEventListener("pointerenter", () => {
+          highlightConnections(agents.indexOf(agent));
+        });
+        button.addEventListener("pointerleave", resetConnections);
+        button.addEventListener("focus", () => {
+          highlightConnections(agents.indexOf(agent));
+        });
+        button.addEventListener("blur", resetConnections);
+        label.append(button);
+        row.append(label);
+
+        for (let step = 0; step < spinSteps; step++) {
+          const spin = agent.spins?.[step];
+          const cell = document.createElement("td");
+          cell.className = "spin-cell";
+          if (spin === 1 || spin === -1) {
+            if (mode === "objective") {
+              cell.textContent = spin === 1 ? "A" : "B";
+              cell.style.backgroundColor = spin === 1 ? "#cfe5ff" : "#fff0a6";
+            } else {
+              cell.textContent = spin === 1 ? "Agree" : "Disagree";
+              cell.style.backgroundColor = spin === 1 ? "#ccebd3" : "#f5cccc";
+            }
+          } else {
+            cell.classList.add("neutral");
+            cell.textContent = spin === 0 ? "Undecided" : "—";
+          }
+          const timeLabel = hasInitialSpin && step === 0
+            ? "initial"
+            : `step ${hasInitialSpin ? step : step + 1}`;
+          cell.title = `agent ${agent.index}, ${timeLabel}: ${cell.textContent}`;
+          row.append(cell);
+        }
+        body.append(row);
+      }
+    }
+
+    const personaPanel = document.getElementById("persona-panel");
+    function clearMath(element) {
+      if (window.MathJax?.typesetClear) {
+        window.MathJax.typesetClear([element]);
+      }
+    }
+    function typesetMath(element) {
+      if (window.MathJax?.typesetPromise) {
+        window.MathJax.typesetPromise([element]);
+      }
+    }
+    function showPersona(agent) {
+      document.getElementById("persona-title").textContent = `agent ${agent.index}`;
+      const personaText = document.getElementById("persona-text");
+      clearMath(personaText);
+      personaText.textContent = agent.persona || "";
+      personaPanel.hidden = false;
+      typesetMath(personaText);
+    }
+    window.addEventListener("load", () => {
+      const personaText = document.getElementById("persona-text");
+      if (!personaPanel.hidden) typesetMath(personaText);
+      typesetMath(messageList);
+    });
+    document.getElementById("persona-close").addEventListener("click", () => {
+      personaPanel.hidden = true;
+    });
+
+    const slider = document.getElementById("step-slider");
+    const timelineLabel = document.getElementById("timeline-label");
+    const messageList = document.getElementById("message-list");
+    slider.max = String(Math.max(messageSteps, 1));
+    slider.disabled = messageSteps === 0;
+
+    function renderMessages() {
+      const step = Number(slider.value) - 1;
+      timelineLabel.textContent = messageSteps ? `Step ${step + 1}` : "No messages";
+      clearMath(messageList);
+      messageList.replaceChildren();
+      if (!messageSteps) {
+        messageList.textContent = "No message history is available.";
+        return;
+      }
+      for (const agent of agents) {
+        const message = agent.messages?.[step];
+        if (message === undefined) continue;
+        const card = document.createElement("article");
+        card.className = "message-card";
+        const title = document.createElement("h3");
+        title.textContent = `agent ${agent.index}`;
+        const text = document.createElement("p");
+        text.textContent = message;
+        card.append(title, text);
+        messageList.append(card);
+      }
+      if (!messageList.childElementCount) {
+        messageList.textContent = "No messages were recorded for this step.";
+      }
+      typesetMath(messageList);
+    }
+
+    slider.addEventListener("input", renderMessages);
+    document.getElementById("previous-step").addEventListener("click", () => {
+      slider.value = String(Math.max(1, Number(slider.value) - 1));
+      renderMessages();
+    });
+    document.getElementById("next-step").addEventListener("click", () => {
+      slider.value = String(Math.min(messageSteps, Number(slider.value) + 1));
+      renderMessages();
+    });
+    renderNetwork();
+    renderHeatmap();
+    renderMessages();
+  </script>
+</body>
+</html>

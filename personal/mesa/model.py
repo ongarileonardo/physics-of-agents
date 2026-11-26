@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 from lib.datagen.utils import Pi
 from typing import Optional, Callable
 import mesa 
@@ -78,46 +80,53 @@ class OpinionModel(mesa.Model):
       for other_agent in self.opinion_agents:
         j = other_agent.agent_index
         if self.J[i, j] > 0:
-          print(f"- **(+) agent {i} to {j}:**\n \t - _{message}_ \n")
           other_agent.receive_message(message, agree=True)
         elif self.J[i, j] < 0:
-          print(f"- **(-) agent {i} to {j}:**\n \t - _{message}_ \n")
           other_agent.receive_message(message, agree=False)
 
-  def step(self):
-    print(f"## Step {self.round}")
-
-    agents = self.opinion_agents
-
-    # phase A: communication 
-
-    print("### Messages")
-
-    messages = self.llm.run_concurrent(
-      task=lambda agent: agent.generate_message(),
-      agents=agents,
-    )
-
-    for agent, message in zip(agents, messages):
-      agent.message_history.append(message)
-
-    self.distribute_messages()
-
-    # phase B: opinion update
-
-    print("### Opinions")
-
-    self.llm.run_concurrent(
-      task=lambda agent: agent.sample_spin(k=self.k),
-      agents=agents,
-    )
-
-    self.round += 1
+  def save_output(self) -> None:
+    output = {
+      "question": self.question,
+      "choices": self.choices,
+      "mode": self.mode,
+      "agents": [
+        {
+          "index": agent.agent_index,
+          "persona": agent.persona,
+          "spins": agent.spin_history,
+          "messages": agent.message_history,
+        }
+        for agent in self.opinion_agents
+      ],
+      "J": self.J.tolist(),
+    }
+    output_path = Path(__file__).with_name("output.json")
+    with output_path.open("w", encoding="utf-8") as file:
+      json.dump(output, file, ensure_ascii=False, indent=2)
+      file.write("\n")
 
   def run(self):
-    print(f"# Question: {self.question} \n")
-    for agent in self.opinion_agents:
-      print(f"**Agent {agent.agent_index}**: {agent.persona} \n")
+    agents=self.opinion_agents
+
+    # initial opinion sample
+    self.llm.run_concurrent(
+      task=lambda agent: agent.sample_spin(k=self.k),
+      agents=agents
+    )
 
     for t in range(self.timesteps):
-      self.step()
+      messages = self.llm.run_concurrent(
+        task=lambda agent: agent.generate_message(),
+        agents=agents,
+      )
+
+      self.distribute_messages()
+
+      self.llm.run_concurrent(
+        task=lambda agent: agent.sample_spin(k=self.k),
+        agents=agents,
+      )
+
+      self.round += 1
+
+    self.save_output()

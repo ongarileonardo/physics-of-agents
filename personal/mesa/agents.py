@@ -49,8 +49,6 @@ class OpinionAgent(mesa.Agent):
 
     self.spin = majority_spin
     self.spin_history.append(majority_spin)
-    
-    print(f"**agent {self.agent_index}**: {majority_spin} \n")
 
     return majority_spin
 
@@ -67,6 +65,8 @@ class OpinionAgent(mesa.Agent):
       mode=self.model.mode,
       choices=self.model.choices,
     )
+
+    self.message_history.append(message)
 
     return message
   
