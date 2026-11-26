@@ -1,7 +1,5 @@
 import mesa
 
-from typing import Optional
-
 from lib.datagen.samplers import message_sampler, \
           spin_sampler_stateful, spin_sampler
 
@@ -14,7 +12,7 @@ class OpinionAgent(mesa.Agent):
     agent_index: int,
     persona: str,
   ):
-    super().__init__(model)
+    super().__init__(agent_index, model)
 
     self.agent_index = agent_index
     self.persona = persona
@@ -51,6 +49,8 @@ class OpinionAgent(mesa.Agent):
 
     self.spin = majority_spin
     self.spin_history.append(majority_spin)
+    
+    print(f"**agent {self.agent_index}**: {majority_spin} \n")
 
     return majority_spin
 
@@ -73,11 +73,11 @@ class OpinionAgent(mesa.Agent):
   def receive_message(
     self,
     message: str,
-    agrees: bool,
+    agree: bool,
   ):
     """Receive a message in the appropriate inbox."""
 
-    if agrees:
+    if agree:
         self.inbox_agree.append(message)
     else:
         self.inbox_disagree.append(message)

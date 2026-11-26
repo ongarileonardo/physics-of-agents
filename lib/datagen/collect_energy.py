@@ -41,7 +41,7 @@ def resolve_backend(model: str, backend: str | None) -> str:
     """Resolve the API backend: explicit flag > registry > infer from name."""
     if backend is not None:
         return backend
-    return BACKENDS.get(model) or ("openrouter" if "/" in model else "openai")
+    return BACKENDS.get(model) or "openrouter"
 
 
 def load_canonical_personas(

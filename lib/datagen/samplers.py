@@ -149,7 +149,7 @@ def spin_sampler_stateful(
         user_prompt = (
             _objective_context(persona, question, choices,
                                messages_agree, messages_disagree)
-            + f"Your current answer to the problem is {letter}."
+            + f"Last time I asked you, your answer to the problem was {letter}."
             + OBJECTIVE_SPIN_INSTRUCTION
         )
         return _parse_spin_objective(pi(user_prompt))
@@ -162,7 +162,7 @@ def spin_sampler_stateful(
         f"Given this background, is your persona currently more likely to AGREE or "
         f"DISAGREE with the statement?\n"
         f"## Response Format\n"
-        f"Respond with exactly one word: AGREE or DISAGREE."
+        f"RESPOND WITH EXACTLY ONE WORD: AGREE or DISAGREE."
     )
     return _parse_spin_subjective(pi(user_prompt))
 
